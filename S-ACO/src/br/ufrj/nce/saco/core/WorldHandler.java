@@ -5,7 +5,7 @@ import java.util.Random;
 public class WorldHandler {
 
 	private Ant[] ants;
-	private World world;
+	private Pheromone pheromone;
 	private Random rand;
 
 	public WorldHandler() {
@@ -18,7 +18,7 @@ public class WorldHandler {
 
 	public void initialize(int antsAmount) {
 		this.ants = new Ant[antsAmount];
-		this.world = new World();
+		this.pheromone = new Pheromone();
 
 		for (int i = 0; i < antsAmount; i++) {
 			this.ants[i] = new Ant(0, 18);
@@ -30,22 +30,22 @@ public class WorldHandler {
 		for (int i = 0; i < ants.length; i++) {
 
 			int currentNode = ants[i].getCurrentNode();
-			double[] pheromoneNeighbourhood = world.getPheromoneNeighbourhood(currentNode);
+			double[] pheromoneNeighbourhood = pheromone.getPheromoneNeighbourhood(currentNode);
 			ants[i].move(pheromoneNeighbourhood, this.rand.nextDouble());
 			
 			if(ants[i].getPheromoneAmount() > 0){
-				world.addPheromone(currentNode, ants[i].getCurrentNode(), ants[i].getPheromoneAmount());
-				world.addPheromone(ants[i].getCurrentNode(), currentNode, ants[i].getPheromoneAmount());
+				pheromone.addPheromone(currentNode, ants[i].getCurrentNode(), ants[i].getPheromoneAmount());
+				pheromone.addPheromone(ants[i].getCurrentNode(), currentNode, ants[i].getPheromoneAmount());
 			}
 		}
-		world.updatePheromoneTrail();
+		pheromone.updatePheromoneTrail();
 	}
 
 	public void worldPrint() {
 		String linha = "";
-		for (int i = 0; i < world.getPheromoneNeighbourhood(i).length; i++) {
-			for (int j = 0; j < world.getPheromoneNeighbourhood(i).length; j++) {
-				linha += world.getPheromoneNeighbourhood(i)[j] + ", ";
+		for (int i = 0; i < pheromone.getPheromoneNeighbourhood(i).length; i++) {
+			for (int j = 0; j < pheromone.getPheromoneNeighbourhood(i).length; j++) {
+				linha += pheromone.getPheromoneNeighbourhood(i)[j] + ", ";
 			}
 			System.out.println(linha);
 			linha = "";
@@ -53,7 +53,7 @@ public class WorldHandler {
 	}
 	
 	public String getBestPath(){
-		return world.getBestPath();
+		return pheromone.getBestPath();
 	}
 	
 
