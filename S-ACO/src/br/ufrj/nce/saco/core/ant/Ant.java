@@ -1,5 +1,6 @@
-package br.ufrj.nce.saco.core;
+package br.ufrj.nce.saco.core.ant;
 
+import br.ufrj.nce.saco.core.path.Path;
 import br.ufrj.nce.saco.utils.Constants;
 
 public class Ant {

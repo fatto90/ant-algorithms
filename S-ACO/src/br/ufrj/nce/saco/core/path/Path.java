@@ -1,4 +1,4 @@
-package br.ufrj.nce.saco.core;
+package br.ufrj.nce.saco.core.path;
 
 public class Path {
 

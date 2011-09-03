@@ -1,6 +1,6 @@
 package br.ufrj.nce.saco.main;
 
-import br.ufrj.nce.saco.core.World;
+import br.ufrj.nce.saco.core.world.World;
 import br.ufrj.nce.saco.utils.Constants;
 
 public class Simulator {

@@ -1,6 +1,9 @@
-package br.ufrj.nce.saco.core;
+package br.ufrj.nce.saco.core.world;
 
 import java.util.Random;
+
+import br.ufrj.nce.saco.core.ant.Ant;
+import br.ufrj.nce.saco.core.pheromone.Pheromone;
 
 public class World {
 
