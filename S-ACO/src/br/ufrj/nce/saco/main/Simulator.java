@@ -1,20 +1,22 @@
 package br.ufrj.nce.saco.main;
 
 import br.ufrj.nce.saco.core.WorldHandler;
+import br.ufrj.nce.saco.utils.Constants;
 
 public class Simulator {
 
 	public static void main(String[] args) {
-		WorldHandler handler = new WorldHandler(2003453123);
+		WorldHandler handler = new WorldHandler();
 
-		handler.initialize(1);
+		handler.initialize(Constants.ANTS_TOTAL);
 
 		try {
-			for (int i = 0; i < 20; i++) {
-				System.out.println("Iteração " + i);
+			for (int i = 0; i < Constants.INTERATIONS_TOTAL; i++) {
 				handler.run(i);
-				// handler.worldPrint();
 			}
+			
+			System.out.println("Melhor caminho: " + handler.getBestPath());
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

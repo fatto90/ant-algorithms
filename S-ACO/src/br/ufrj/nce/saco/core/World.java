@@ -3,7 +3,8 @@ package br.ufrj.nce.saco.core;
 public class World {
 	
 	private double ro = 0.1;
-	private double [][]pheromoneTrail = {//	00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20
+	private double [][]pheromoneTrail = {
+									 //	00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18
 										{0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, //00
 										{1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, //01
 										{1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, //02
@@ -55,7 +56,10 @@ public class World {
 		}
 	}
 	
-	public void addPheromone(int nodeSource, int nodeDestination, double amount){
+	public void addPheromone(int nodeSource, int nodeDestination, double amount) throws Exception{
+		if (nodeSource == nodeDestination){
+			throw new Exception("Node source equal node destination [" + nodeSource + ", " +nodeDestination + "]");
+		}
 		this.pheromoneTrail[nodeSource][nodeDestination] += amount;
 	}
 	
@@ -65,6 +69,26 @@ public class World {
 	
 	public double[] getPheromoneNeighbourhood(int node){
 		return this.pheromoneTrail[node];
+	}
+	
+	public String getBestPath(){
+		String path = "0, ";
+		double temp = 0;
+		int node = 0;
+		
+		for (int i = 0; i < pheromoneTrail.length - 1; i = node) {
+			
+			for (int j = i + 1; j < pheromoneTrail.length; j++) {
+				if (temp < pheromoneTrail[i][j]){
+					node = j;
+					temp = pheromoneTrail[i][j];
+				} 
+			}
+			path += node + ", ";
+			temp = 0;
+		}
+		
+		return path;
 	}
 	
 }

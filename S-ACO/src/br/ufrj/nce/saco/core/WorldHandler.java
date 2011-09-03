@@ -32,13 +32,13 @@ public class WorldHandler {
 			int currentNode = ants[i].getCurrentNode();
 			double[] pheromoneNeighbourhood = world.getPheromoneNeighbourhood(currentNode);
 			ants[i].move(pheromoneNeighbourhood, this.rand.nextDouble());
-			world.addPheromone(currentNode, ants[i].getCurrentNode(), ants[i].getPheromoneAmount());
-			world.addPheromone(ants[i].getCurrentNode(), currentNode, ants[i].getPheromoneAmount());
-			System.out.println("Formiga " + i + " - nó " + ants[i].getCurrentNode() + " - Path: [" + ants[i].getPath() + "] ");
-
+			
+			if(ants[i].getPheromoneAmount() > 0){
+				world.addPheromone(currentNode, ants[i].getCurrentNode(), ants[i].getPheromoneAmount());
+				world.addPheromone(ants[i].getCurrentNode(), currentNode, ants[i].getPheromoneAmount());
+			}
 		}
 		world.updatePheromoneTrail();
-		System.out.println("");
 	}
 
 	public void worldPrint() {
@@ -51,5 +51,10 @@ public class WorldHandler {
 			linha = "";
 		}
 	}
+	
+	public String getBestPath(){
+		return world.getBestPath();
+	}
+	
 
 }

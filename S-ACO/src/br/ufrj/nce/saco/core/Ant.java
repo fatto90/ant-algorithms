@@ -1,11 +1,12 @@
 package br.ufrj.nce.saco.core;
 
+import br.ufrj.nce.saco.utils.Constants;
+
 public class Ant {
 
 	private int sourceNode;
 	private int destinationNode;
 	private int lastPathSize;
-	private int alpha = 1;
 
 	private Mode mode;
 
@@ -45,7 +46,7 @@ public class Ant {
 	public void move(double[] pheromoneTrail, double u) throws Exception {
 
 		if (this.mode == Mode.BACKWARD) {
-			if (path.size() > 0) {
+			if (path.size() > 1) {
 				path.discard();
 			}
 		} else {
@@ -53,9 +54,14 @@ public class Ant {
 			this.path.addNode(temp);
 		}
 
-		if (path.getCurrentNode() == this.sourceNode) {
-			this.switchMode();
+		if (path.getPreviousNode() == this.sourceNode) {
 			this.lastPathSize = 0;
+		}
+		
+		if (path.getCurrentNode() == this.sourceNode && this.path.size() == 1) {
+			this.switchMode();
+			this.path.reset();
+			this.path.addNode(this.sourceNode);
 		}
 
 		if (path.getCurrentNode() == this.destinationNode) {
@@ -66,7 +72,14 @@ public class Ant {
 	}
 
 	public double getPheromoneAmount() {
-		return this.mode == Mode.BACKWARD && this.getCurrentNode() != this.destinationNode ? (1.0 / lastPathSize) : 0.0;
+		
+	double amount = 0; 
+		
+		if (lastPathSize > 0){
+			amount = 1.0 / (double) lastPathSize;
+			System.out.println("L: " + lastPathSize + " - Pheromone: " + amount);
+		}
+		return amount;
 	}
 
 	private int findNextNode(double[] pheromoneTrail, double u) {
@@ -76,13 +89,13 @@ public class Ant {
 
 		for (int i = 0; i < pheromoneTrail.length; i++) {
 			if (i != this.path.getPreviousNode()) {
-				totalPheromone += Math.pow(pheromoneTrail[i], this.alpha);
+				totalPheromone += Math.pow(pheromoneTrail[i], Constants.ALPHA);
 			}
 		}
 
 		for (int i = 0; i < pheromoneTrail.length; i++) {
 			if (i != this.path.getPreviousNode()) {
-				probabilities[i] = Math.pow(pheromoneTrail[i], this.alpha) / totalPheromone;
+				probabilities[i] = Math.pow(pheromoneTrail[i], Constants.ALPHA) / totalPheromone;
 			}
 		}
 

@@ -5,7 +5,8 @@ public class Path {
 	private int[] path = new int[10];
 	private int size = 0;
 	private final int INCREMENT_PATH = 10;
-
+	private int previousNode = 0;
+	
 	public void addNode(int node) {
 		if (size == path.length) {
 			int[] tempPath = path;
@@ -15,12 +16,16 @@ public class Path {
 				path[i] = tempPath[i];
 			}
 		}
+		if (size > 0){
+			this.previousNode = path[size - 1];
+		} 
 		path[size] = node;
 		size++;
 	}
 
 	public int remove() {
 		if (size > 0) {
+			this.previousNode = path[size - 1];
 			size--;
 			int result = path[size];
 			path[size] = 0;
@@ -31,6 +36,7 @@ public class Path {
 
 	public void discard() {
 		if (size > 0) {
+			this.previousNode = path[size - 1];
 			path[--size] = 0;
 		}
 	}
@@ -53,10 +59,11 @@ public class Path {
 	public void reset() {
 		this.path = new int[10];
 		this.size = 0;
+		this.previousNode = 0;
 	}
 
 	public int getCurrentNode() {
-		return size == 0 ? -1 : path[size - 1];
+		return size == 0 ? 0 : path[size - 1];
 	}
 
 	public int getNode(int index) {
@@ -79,14 +86,15 @@ public class Path {
 					}
 
 					this.size -= (j - i);
-					this.size = this.size - 1;
+					//this.size = this.size - 1;					
+					break;
 				}
 			}
 		}
 	}
 
 	public int getPreviousNode() {
-		return size >= 2 ? this.path[size - 2] : -1;
+		return this.previousNode;
 	}
 
 	public static void main(String[] args) {
