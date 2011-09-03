@@ -2,17 +2,17 @@ package br.ufrj.nce.saco.core;
 
 import java.util.Random;
 
-public class PheromoneHandler {
+public class World {
 
 	private Ant[] ants;
 	private Pheromone pheromone;
 	private Random rand;
 
-	public PheromoneHandler() {
+	public World() {
 		rand = new Random();
 	}
 
-	public PheromoneHandler(long seed) {
+	public World(long seed) {
 		rand = new Random(seed);
 	}
 

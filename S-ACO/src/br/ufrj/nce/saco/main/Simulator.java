@@ -1,12 +1,12 @@
 package br.ufrj.nce.saco.main;
 
-import br.ufrj.nce.saco.core.PheromoneHandler;
+import br.ufrj.nce.saco.core.World;
 import br.ufrj.nce.saco.utils.Constants;
 
 public class Simulator {
 
 	public static void main(String[] args) {
-		PheromoneHandler handler = new PheromoneHandler();
+		World handler = new World();
 
 		handler.initialize(Constants.ANTS_TOTAL);
 
