@@ -49,7 +49,7 @@ public class Path {
 			result += path[i] + ", ";
 		}
 
-		return result.substring(0, result.length() - 2);
+		return result.substring(0, Math.min(result.length(), result.length() - 2));
 	}
 
 	public int size() {
@@ -59,7 +59,6 @@ public class Path {
 	public void reset() {
 		this.path = new int[10];
 		this.size = 0;
-		this.previousNode = 0;
 	}
 
 	public int getCurrentNode() {

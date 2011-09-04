@@ -2,12 +2,13 @@ package br.ufrj.nce.saco.core.world;
 
 import java.util.Random;
 
-import br.ufrj.nce.saco.core.ant.Ant;
+import br.ufrj.nce.saco.core.ant.SingleAnt;
 import br.ufrj.nce.saco.core.pheromone.Pheromone;
+import br.ufrj.nce.saco.utils.Constants;
 
 public class World {
 
-	private Ant[] ants;
+	private SingleAnt[] ants;
 	private Pheromone pheromone;
 	private Random rand;
 
@@ -19,27 +20,64 @@ public class World {
 		rand = new Random(seed);
 	}
 
-	public void initialize(int antsAmount) {
-		this.ants = new Ant[antsAmount];
-		this.pheromone = new Pheromone();
+	public void initialize(int antsAmount) throws Exception {
+		this.ants = new SingleAnt[antsAmount];
+		this.pheromone = new Pheromone(19);
+		this.pheromone.setSourceNode(0);
+		this.pheromone.setDestinationNode(18);
+		this.pheromone.addPheromone(0, 1, 1);
+		this.pheromone.addPheromone(0, 2, 1);
+		this.pheromone.addPheromone(1, 3, 1);
+		this.pheromone.addPheromone(2, 4, 1);
+		this.pheromone.addPheromone(2, 5, 1);
+		this.pheromone.addPheromone(3, 6, 1);
+		this.pheromone.addPheromone(4, 7, 1);
+		this.pheromone.addPheromone(4, 9, 1);
+		this.pheromone.addPheromone(4, 14, 1);
+		this.pheromone.addPheromone(5, 7, 1);
+		this.pheromone.addPheromone(5, 10, 1);
+		this.pheromone.addPheromone(5, 15, 1);
+		this.pheromone.addPheromone(6, 8, 1);
+		this.pheromone.addPheromone(7, 12, 1);
+		this.pheromone.addPheromone(8, 11, 1);
+		this.pheromone.addPheromone(9, 14, 1);
+		this.pheromone.addPheromone(10, 15, 1);
+		this.pheromone.addPheromone(11, 13, 1);
+		this.pheromone.addPheromone(12, 14, 1);
+		this.pheromone.addPheromone(12, 15, 1);
+		this.pheromone.addPheromone(13, 16, 1);
+		this.pheromone.addPheromone(14, 17, 1);
+		this.pheromone.addPheromone(15, 17, 1);
+		this.pheromone.addPheromone(16, 18, 1);
+		this.pheromone.addPheromone(17, 18, 1);
+		this.pheromone.setEvaporation(Constants.EVAPORATION_RATE);
 
 		for (int i = 0; i < antsAmount; i++) {
-			this.ants[i] = new Ant(0, 18);
+			this.ants[i] = new SingleAnt(pheromone.getSourceNode());
+			this.ants[i].setAlpha(Constants.ALPHA);
 		}
 	}
 
-	public void run(int print) throws Exception {
+	public void run() throws Exception {
 
 		for (int i = 0; i < ants.length; i++) {
-
-			int currentNode = ants[i].getCurrentNode();
-			double[] pheromoneNeighbourhood = pheromone.getPheromoneNeighbourhood(currentNode);
+			double[] pheromoneNeighbourhood = pheromone.getPheromoneNeighbourhood(ants[i].getCurrentNode());
 			ants[i].move(pheromoneNeighbourhood, this.rand.nextDouble());
-			
-			if(ants[i].getPheromoneAmount() > 0){
-				pheromone.addPheromone(currentNode, ants[i].getCurrentNode(), ants[i].getPheromoneAmount());
-				pheromone.addPheromone(ants[i].getCurrentNode(), currentNode, ants[i].getPheromoneAmount());
+
+			if (ants[i].isPheromoneAvaible()) {
+				pheromone.addPheromone(ants[i].getPreviousNode(), ants[i].getCurrentNode(), ants[i].getPheromoneAmount());
 			}
+
+			if (ants[i].getCurrentNode() == pheromone.getSourceNode() && ants[i].getPathSize() == 1){
+				ants[i].switchMode();
+			}
+
+			if (ants[i].getCurrentNode() == pheromone.getDestinationNode()) {
+				ants[i].removeLoops();
+				ants[i].switchMode();
+			}
+
+			//System.out.println("Ant: " + i + " - path: [" + ants[i].getPath() + "]");
 		}
 		pheromone.updatePheromoneTrail();
 	}
@@ -54,10 +92,13 @@ public class World {
 			linha = "";
 		}
 	}
-	
-	public String getBestPath(){
+
+	public String getBestPath() {
 		return pheromone.getBestPath();
 	}
 	
+	public int getBestPathSize() {
+		return pheromone.getBestPathSize();
+	}
 
 }

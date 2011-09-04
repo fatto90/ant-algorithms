@@ -1,27 +1,33 @@
 package br.ufrj.nce.saco.core.ant;
 
 import br.ufrj.nce.saco.core.path.Path;
-import br.ufrj.nce.saco.utils.Constants;
 
-public class Ant {
+public class SingleAnt {
 
-	private int sourceNode;
-	private int destinationNode;
 	private int lastPathSize;
-
 	private Mode mode;
+	private int alpha = 2;
+	private Path path = new Path();
 
 	public enum Mode {
 		FORWARD, BACKWARD
 	};
 
-	private Path path = new Path();
-
-	public Ant(int sourceNode, int destinationNode) {
+	public SingleAnt(int startNode) {
 		this.mode = Mode.FORWARD;
-		this.sourceNode = sourceNode;
-		this.destinationNode = destinationNode;
-		this.path.addNode(sourceNode);
+		this.path.addNode(startNode);
+	}
+
+	public void setPath(Path path) {
+		this.path = path;
+	}
+
+	public int getAlpha() {
+		return alpha;
+	}
+
+	public void setAlpha(int alpha) {
+		this.alpha = alpha;
 	}
 
 	public int getCurrentNode() {
@@ -36,12 +42,37 @@ public class Ant {
 		return this.mode;
 	}
 
-	public void switchMode() {
-		this.mode = (this.mode == Mode.FORWARD ? Mode.BACKWARD : Mode.FORWARD);
+	public int getPathSize() {
+		return this.path.size();
+	}
+
+	public boolean isPheromoneAvaible() {
+		return this.mode == Mode.BACKWARD;
 	}
 
 	public String getPath() {
 		return this.path.toString();
+	}
+
+	public void removeLoops() {
+		this.path.removeLoops();
+	}
+
+	public double getPheromoneAmount() {
+		//return 0.1; 
+		return this.mode == Mode.BACKWARD? 1.0 / (double) lastPathSize: 0.0; 
+	}
+
+	public void switchMode() {
+		
+		if (this.mode == Mode.FORWARD) {
+			mode = Mode.BACKWARD;
+			this.lastPathSize = this.path.size();
+
+		} else {
+			this.lastPathSize = 0;
+			mode = Mode.FORWARD;
+		}
 	}
 
 	public void move(double[] pheromoneTrail, double u) throws Exception {
@@ -54,33 +85,6 @@ public class Ant {
 			int temp = findNextNode(pheromoneTrail, u);
 			this.path.addNode(temp);
 		}
-
-		if (path.getPreviousNode() == this.sourceNode) {
-			this.lastPathSize = 0;
-		}
-		
-		if (path.getCurrentNode() == this.sourceNode && this.path.size() == 1) {
-			this.switchMode();
-			this.path.reset();
-			this.path.addNode(this.sourceNode);
-		}
-
-		if (path.getCurrentNode() == this.destinationNode) {
-			this.switchMode();
-			this.path.removeLoops();
-			this.lastPathSize = this.path.size();
-		}
-	}
-
-	public double getPheromoneAmount() {
-		
-	double amount = 0; 
-		
-		if (lastPathSize > 0){
-			amount = 1.0 / (double) lastPathSize;
-			System.out.println("L: " + lastPathSize + " - Pheromone: " + amount);
-		}
-		return amount;
 	}
 
 	private int findNextNode(double[] pheromoneTrail, double u) {
@@ -90,13 +94,13 @@ public class Ant {
 
 		for (int i = 0; i < pheromoneTrail.length; i++) {
 			if (i != this.path.getPreviousNode()) {
-				totalPheromone += Math.pow(pheromoneTrail[i], Constants.ALPHA);
+				totalPheromone += Math.pow(pheromoneTrail[i], this.alpha);
 			}
 		}
 
 		for (int i = 0; i < pheromoneTrail.length; i++) {
 			if (i != this.path.getPreviousNode()) {
-				probabilities[i] = Math.pow(pheromoneTrail[i], Constants.ALPHA) / totalPheromone;
+				probabilities[i] = Math.pow(pheromoneTrail[i], this.alpha) / totalPheromone;
 			}
 		}
 
