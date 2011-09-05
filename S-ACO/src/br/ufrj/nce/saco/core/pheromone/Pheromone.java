@@ -9,10 +9,10 @@ package br.ufrj.nce.saco.core.pheromone;
 
 public class Pheromone {
 
-	private double evaporation;
 	private double[][] pheromoneTrail;
 	private int sourceNode;
 	private int destinationNode;
+	private int size;
 	
 	
 	/**  
@@ -20,14 +20,7 @@ public class Pheromone {
 	 */
 	public Pheromone(int size) {
 		this.pheromoneTrail = new double[size][size];
-	}
-
-	
-	/** 
-	 * @param evaporation This parameter specifies the evaporation rate
-	 */
-	public void setEvaporation(double evaporation) {
-		this.evaporation = evaporation;
+		this.size = size;
 	}
 
 	/** 
@@ -72,17 +65,34 @@ public class Pheromone {
 	 * 
 	 * @param nodeSource the source node
 	 * @param nodeDestination the destination node
-	 * @return
+	 * @return the pheromone amount between two nodes
 	 */
 	public double getPheromoneAmount(int nodeSource, int nodeDestination) {
 		return this.pheromoneTrail[nodeSource][nodeDestination];
 	}
 
+	
+	/**
+	 * This method helps to retrieve the amount of pheromone from the neighbourhood of a specific node
+	 * @param node the node witch we want retrieve the neighbourhood
+	 * @return an double array containing the neighbourhood from the node specified in the parameter
+	 */
 	public double[] getPheromoneNeighbourhood(int node) {
 		return this.pheromoneTrail[node];
 	}
 
-	public void updatePheromoneTrail() {
+	
+	/** This should be used to update all pheromone array called pheromone trail.
+	 * The evaporation constant between 0 and 1 must to be specified. 
+	 * @param evaporation the evaporation constant 
+	 * @throws Exception If the evaporation constant not between 0.0 and 1.0
+	 */
+	public void updatePheromoneTrail(double evaporation) throws Exception {
+		
+		if (evaporation < 0 || evaporation > 1){
+			throw new Exception("The evaporation constant must to be between 0.0 and 1.0.");
+		}
+		
 		for (int i = 0; i < this.pheromoneTrail.length; i++) {
 			for (int j = 0; j < this.pheromoneTrail.length; j++) {
 				this.pheromoneTrail[i][j] = (1 - evaporation) * this.pheromoneTrail[i][j];
@@ -90,16 +100,41 @@ public class Pheromone {
 		}
 	}
 
-	public void addPheromone(int nodeSource, int nodeDestination, double amount) throws Exception {
+	/**
+	 * Adds pheromone to the pheromone trail
+	 * 
+	 * @param nodeSource the node where the ant moves from. This parameter must be between zero and
+	 * the size parameter specified in the constructor.  
+	 * @param nodeDestination the node where the ant moves to. This parameter must be between zero and
+	 * the size parameter specified in the constructor.
+	 * @param amount the amount of pheromone to be placed between source and destination nodes.
+	 *  The amount of pheromone must be greater or equal zero.
+	 *  
+	 * @throws IllegalArgumentException Throws if node source or destination node be less than zero 
+	 * or greater than size of pheromone trail or if the amount of pheromone less than zero or if 
+	 * the source and the destination node are the same. 
+	 */
+	public void addPheromone(int nodeSource, int nodeDestination, double amount) throws IllegalArgumentException {
 		if (nodeSource == nodeDestination) {
-			throw new Exception("Node source is equal destination node [" + nodeSource + ", " + nodeDestination + "]");
+			throw new IllegalArgumentException("Node source must be different from the destination node [" + nodeSource + ", " + nodeDestination + "]");
 		}
+		if (nodeSource < 0 || destinationNode < 0) {
+			throw new IllegalArgumentException("The source node or destination node must be greater than zero.");			
+		}
+		if (nodeSource >= this.size || nodeDestination >= this.size) {
+			throw new IllegalArgumentException("The source node or destination node must be less than size.");			
+		}
+		if (amount < 0) {
+			throw new IllegalArgumentException("The amount of pheromone node must be greater or equal than zero.");			
+		}
+		
 		this.pheromoneTrail[nodeSource][nodeDestination] += amount;
 		this.pheromoneTrail[nodeDestination][nodeSource] += amount;
 	}
 
 	/**
-	 * @return
+	 * Retrieves the best path pheromone trail
+	 * @return a string with the best pheromone trail
 	 */
 	public String getBestPath() {
 		String path = "0, ";
@@ -121,7 +156,9 @@ public class Pheromone {
 	}
 
 	/**
-	 * @return
+	 * Retrieves the best pheromone trail, ie, the path whose the nodes have more pheromone than 
+	 * the others nodes.
+	 * @return an integer representing the length of the best pheromone trail. 
 	 */
 	public int getBestPathSize() {
 		int size = 0;

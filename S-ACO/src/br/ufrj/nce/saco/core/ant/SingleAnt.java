@@ -2,12 +2,18 @@ package br.ufrj.nce.saco.core.ant;
 
 import br.ufrj.nce.saco.core.path.Path;
 
+/**
+ * @author Fabio Barbosa
+ * This class represents a single ant used in Simple-ACO algorithm
+ *
+ */
 public class SingleAnt {
 
 	private int lastPathSize;
-	private Mode mode;
 	private int alpha = 2;
+	private Mode mode;
 	private Path path = new Path();
+	
 
 	public enum Mode {
 		FORWARD, BACKWARD
@@ -16,6 +22,7 @@ public class SingleAnt {
 	public SingleAnt(int startNode) {
 		this.mode = Mode.FORWARD;
 		this.path.addNode(startNode);
+		//this.id = id;
 	}
 
 	public void setPath(Path path) {
@@ -59,7 +66,6 @@ public class SingleAnt {
 	}
 
 	public double getPheromoneAmount() {
-		//return 0.1; 
 		return this.mode == Mode.BACKWARD? 1.0 / (double) lastPathSize: 0.0; 
 	}
 

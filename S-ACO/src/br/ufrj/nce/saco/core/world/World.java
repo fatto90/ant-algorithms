@@ -50,7 +50,6 @@ public class World {
 		this.pheromone.addPheromone(15, 17, 1);
 		this.pheromone.addPheromone(16, 18, 1);
 		this.pheromone.addPheromone(17, 18, 1);
-		this.pheromone.setEvaporation(Constants.EVAPORATION_RATE);
 
 		for (int i = 0; i < antsAmount; i++) {
 			this.ants[i] = new SingleAnt(pheromone.getSourceNode());
@@ -79,7 +78,7 @@ public class World {
 
 			//System.out.println("Ant: " + i + " - path: [" + ants[i].getPath() + "]");
 		}
-		pheromone.updatePheromoneTrail();
+		pheromone.updatePheromoneTrail(Constants.EVAPORATION_RATE);
 	}
 
 	public void worldPrint() {
