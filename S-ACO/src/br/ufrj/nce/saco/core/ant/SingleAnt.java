@@ -103,6 +103,11 @@ public class SingleAnt {
 				totalPheromone += Math.pow(pheromoneTrail[i], this.alpha);
 			}
 		}
+		
+		// if there isn't neighbors with pheromone amount greater than zero, than the ant come back to the last node
+		if (totalPheromone == 0.0){
+			return this.path.getPreviousNode();
+		}
 
 		for (int i = 0; i < pheromoneTrail.length; i++) {
 			if (i != this.path.getPreviousNode()) {

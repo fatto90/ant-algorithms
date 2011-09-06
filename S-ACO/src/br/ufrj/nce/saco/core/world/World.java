@@ -22,9 +22,7 @@ public class World {
 
 	public void initialize(int antsAmount) throws Exception {
 		this.ants = new SingleAnt[antsAmount];
-		this.pheromone = new Pheromone(19);
-		this.pheromone.setSourceNode(0);
-		this.pheromone.setDestinationNode(18);
+		this.pheromone = new Pheromone(0, 18, 19);
 		this.pheromone.addPheromone(0, 1, 1);
 		this.pheromone.addPheromone(0, 2, 1);
 		this.pheromone.addPheromone(1, 3, 1);
@@ -60,8 +58,13 @@ public class World {
 	public void run() throws Exception {
 
 		for (int i = 0; i < ants.length; i++) {
-			double[] pheromoneNeighbourhood = pheromone.getPheromoneNeighbourhood(ants[i].getCurrentNode());
-			ants[i].move(pheromoneNeighbourhood, this.rand.nextDouble());
+			
+			if (Constants.TRACE_ON){
+				System.out.println("Ant: " + i + " - path: [" + ants[i].getPath() + "]");
+			}
+			
+			double[] pheromoneNeighborhood = pheromone.getPheromoneNeighborhood(ants[i].getCurrentNode());
+			ants[i].move(pheromoneNeighborhood, this.rand.nextDouble());
 
 			if (ants[i].isPheromoneAvaible()) {
 				pheromone.addPheromone(ants[i].getPreviousNode(), ants[i].getCurrentNode(), ants[i].getPheromoneAmount());
@@ -75,17 +78,15 @@ public class World {
 				ants[i].removeLoops();
 				ants[i].switchMode();
 			}
-
-			//System.out.println("Ant: " + i + " - path: [" + ants[i].getPath() + "]");
 		}
 		pheromone.updatePheromoneTrail(Constants.EVAPORATION_RATE);
 	}
 
 	public void worldPrint() {
 		String linha = "";
-		for (int i = 0; i < pheromone.getPheromoneNeighbourhood(i).length; i++) {
-			for (int j = 0; j < pheromone.getPheromoneNeighbourhood(i).length; j++) {
-				linha += pheromone.getPheromoneNeighbourhood(i)[j] + ", ";
+		for (int i = 0; i < pheromone.getPheromoneNeighborhood(i).length; i++) {
+			for (int j = 0; j < pheromone.getPheromoneNeighborhood(i).length; j++) {
+				linha += pheromone.getPheromoneNeighborhood(i)[j] + ", ";
 			}
 			System.out.println(linha);
 			linha = "";
@@ -98,6 +99,25 @@ public class World {
 	
 	public int getBestPathSize() {
 		return pheromone.getBestPathSize();
+	}
+	
+	public String chooseBestPath(){
+		return pheromone.chooseBestPath(this.pheromone.getSourceNode(), this.pheromone.getSourceNode());
+	}
+	
+	public int countBestPath(){
+		return pheromone.countBestPath(this.pheromone.getSourceNode(), this.pheromone.getSourceNode());
+	}
+
+	public void removePheromone() {
+		pheromone.removePheromone(4, 14);
+		pheromone.removePheromone(5, 15);
+		
+	}
+
+	public void addPheromone() {
+		pheromone.addPheromone(4, 14, 1);
+		pheromone.addPheromone(5, 15, 1);
 	}
 
 }

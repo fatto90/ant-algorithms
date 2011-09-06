@@ -85,7 +85,6 @@ public class Path {
 					}
 
 					this.size -= (j - i);
-					//this.size = this.size - 1;					
 					break;
 				}
 			}

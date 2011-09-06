@@ -18,9 +18,11 @@ public class Pheromone {
 	/**  
 	 * @param size This parameter specifies the total of nodes present on the simulation
 	 */
-	public Pheromone(int size) {
+	public Pheromone(int sourceNode, int destinationNode, int size) {
 		this.pheromoneTrail = new double[size][size];
 		this.size = size;
+		this.sourceNode = sourceNode;
+		this.destinationNode = destinationNode;
 	}
 
 	/** 
@@ -73,11 +75,11 @@ public class Pheromone {
 
 	
 	/**
-	 * This method helps to retrieve the amount of pheromone from the neighbourhood of a specific node
-	 * @param node the node witch we want retrieve the neighbourhood
-	 * @return an double array containing the neighbourhood from the node specified in the parameter
+	 * This method helps to retrieve the amount of pheromone from the neighborhood of a specific node
+	 * @param node the node witch we want retrieve the neighborhood
+	 * @return an double array containing the neighborhood from the node specified in the parameter
 	 */
-	public double[] getPheromoneNeighbourhood(int node) {
+	public double[] getPheromoneNeighborhood(int node) {
 		return this.pheromoneTrail[node];
 	}
 
@@ -131,13 +133,18 @@ public class Pheromone {
 		this.pheromoneTrail[nodeSource][nodeDestination] += amount;
 		this.pheromoneTrail[nodeDestination][nodeSource] += amount;
 	}
+	
+	public void removePheromone(int nodeSource, int nodeDestination){
+		this.pheromoneTrail[nodeSource][nodeDestination] = 0;
+		this.pheromoneTrail[nodeDestination][nodeSource] = 0;
+	}
 
 	/**
 	 * Retrieves the best path pheromone trail
 	 * @return a string with the best pheromone trail
 	 */
 	public String getBestPath() {
-		String path = "0, ";
+		String path = this.sourceNode + ", ";
 		double temp = 0;
 		int node = 0;
 
@@ -154,7 +161,43 @@ public class Pheromone {
 		}
 		return path;
 	}
+	
+	public String chooseBestPath(int previousNode, int node){
+		double temp = 0;
+		int nextNode = 0; 
+		
+		for (int i = 0; i < pheromoneTrail.length; i++){
+			if (temp < pheromoneTrail[node][i] && i != previousNode && i != node) {
+				nextNode = i;
+				temp = pheromoneTrail[node][i];
+			}
+		}
+		if (nextNode == this.destinationNode){
+			return node + ", " + this.destinationNode;
+		} else{
+			return node + ", " + chooseBestPath(node, nextNode);
+			
+		}
+	}
 
+	public int countBestPath(int previousNode, int node){
+		double temp = 0;
+		int nextNode = 0; 
+		
+		for (int i = 0; i < pheromoneTrail.length; i++){
+			if (temp < pheromoneTrail[node][i] && i != previousNode && i != node) {
+				nextNode = i;
+				temp = pheromoneTrail[node][i];
+			}
+		}
+		if (nextNode == this.destinationNode){
+			return 1;
+		} else{
+			return 1 + countBestPath(node, nextNode);
+		}
+	}
+
+	
 	/**
 	 * Retrieves the best pheromone trail, ie, the path whose the nodes have more pheromone than 
 	 * the others nodes.
