@@ -1,12 +1,16 @@
 package br.ufrj.nce.saco.utils;
 
 public class Constants {
-	public static final double EVAPORATION_RATE = 0.01;
-	public static final int ALPHA = 1;
-	public static final int ANTS = 32;
-	public static final int STEPS_1 = 300;
-	public static final int STEPS_2 = 1700;
-	public static final int SIMULATIONS = 20;
-	public static final boolean TRACE_ON = false;
-	public static final boolean DISPLAY_BEST_PATH = true;
+	public static final double EVAPORATION_RATE = 0.0;
+	public static final int ALPHA = 2;
+	public static final int ANTS = 8;
+	public static final int STEPS_1 = 1000;
+	public static final int STEPS_2 = 0;
+	public static final int STEPS_3 = 0;
+	public static final int SIMULATIONS = 100;
+	public static final boolean PHEROMONE_UPDATE_CONSTANT = false;
+	
+	public static final boolean PRINT_LOGS_ON = false;
+	public static final boolean PRINT_TRACK = false;
+	public static final boolean PRINT_BEST_PATH = false;
 }

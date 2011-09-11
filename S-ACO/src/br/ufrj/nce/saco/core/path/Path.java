@@ -27,20 +27,22 @@ public class Path {
 		if (size > 0) {
 			this.previousNode = path[size - 1];
 			size--;
+			
 			int result = path[size];
 			path[size] = 0;
+			
 			return result;
 		}
 		return 0;
 	}
 
-	public void discard() {
+	public void comeBack() {
 		if (size > 0) {
 			this.previousNode = path[size - 1];
 			path[--size] = 0;
 		}
 	}
-
+	
 	@Override
 	public String toString() {
 
@@ -94,20 +96,8 @@ public class Path {
 	public int getPreviousNode() {
 		return this.previousNode;
 	}
-
-	public static void main(String[] args) {
-		Path path = new Path();
-		path.addNode(1);
-		path.addNode(2);
-		path.remove();
-		path.addNode(3);
-		path.addNode(4);
-		path.remove();
-		path.addNode(5);
-		path.remove();
-
-		System.out.println(path.getPreviousNode());
-		System.out.println(path.toString());
-
+	
+	public int getLastNode() {
+		return path[size - 2];
 	}
 }

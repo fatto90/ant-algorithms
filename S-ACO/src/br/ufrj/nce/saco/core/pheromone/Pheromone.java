@@ -1,5 +1,7 @@
 package br.ufrj.nce.saco.core.pheromone;
 
+import java.util.Arrays;
+
 /**
  * This class was created to help handle the pheromone trail. 
  * The class instance have to be done specifying the amount of nodes at the class constructor.
@@ -134,92 +136,93 @@ public class Pheromone {
 		this.pheromoneTrail[nodeDestination][nodeSource] += amount;
 	}
 	
-	public void removePheromone(int nodeSource, int nodeDestination){
+	public void clearPheromone(int nodeSource, int nodeDestination){
 		this.pheromoneTrail[nodeSource][nodeDestination] = 0;
 		this.pheromoneTrail[nodeDestination][nodeSource] = 0;
 	}
-
-	/**
-	 * Retrieves the best path pheromone trail
-	 * @return a string with the best pheromone trail
-	 */
-	public String getBestPath() {
-		String path = this.sourceNode + ", ";
-		double temp = 0;
-		int node = 0;
-
-		for (int i = 0; i < pheromoneTrail.length - 1; i = node) {
-
-			for (int j = i + 1; j < pheromoneTrail.length; j++) {
-				if (temp < pheromoneTrail[i][j]) {
-					node = j;
-					temp = pheromoneTrail[i][j];
-				}
-			}
-			path += node + ", ";
-			temp = 0;
-		}
-		return path;
-	}
 	
-	public String chooseBestPath(int previousNode, int node){
-		double temp = 0;
-		int nextNode = 0; 
-		
-		for (int i = 0; i < pheromoneTrail.length; i++){
-			if (temp < pheromoneTrail[node][i] && i != previousNode && i != node) {
-				nextNode = i;
-				temp = pheromoneTrail[node][i];
-			}
-		}
-		if (nextNode == this.destinationNode){
-			return node + ", " + this.destinationNode;
-		} else{
-			return node + ", " + chooseBestPath(node, nextNode);
-			
-		}
+	public String getPheromoneMatrix(){
+		return Arrays.toString(pheromoneTrail);
 	}
 
-	public int countBestPath(int previousNode, int node){
-		double temp = 0;
-		int nextNode = 0; 
-		
-		for (int i = 0; i < pheromoneTrail.length; i++){
-			if (temp < pheromoneTrail[node][i] && i != previousNode && i != node) {
-				nextNode = i;
-				temp = pheromoneTrail[node][i];
-			}
-		}
-		if (nextNode == this.destinationNode){
-			return 1;
-		} else{
-			return 1 + countBestPath(node, nextNode);
-		}
-	}
-
-	
 	/**
 	 * Retrieves the best pheromone trail, ie, the path whose the nodes have more pheromone than 
 	 * the others nodes.
 	 * @return an integer representing the length of the best pheromone trail. 
 	 */
+
+	public String printBestPath() {
+		int[] partialPath = {this.sourceNode};
+		int[] bestPath = getBestPath(partialPath, this.sourceNode);
+		return Arrays.toString(bestPath);
+	}
+	
 	public int getBestPathSize() {
-		int size = 0;
-		double temp = 0;
-		int node = 0;
-
-		for (int i = 0; i < pheromoneTrail.length - 1; i = node) {
-
-			for (int j = i + 1; j < pheromoneTrail.length; j++) {
-				if (temp < pheromoneTrail[i][j]) {
-					node = j;
-					temp = pheromoneTrail[i][j];
-				}
+		int[] partialPath = {this.sourceNode};
+		int[] bestPath = getBestPath(partialPath, this.sourceNode);
+		return bestPath.length - 1;		
+	}
+	
+	private int[] getBestPath(int[] partialPath, int node) {
+		double pheromoneAmount = 0;
+		int nextNode = 0;
+		double[] neigborhood = pheromoneTrail[node];
+		boolean nodeWasFind = false;
+		
+		for(int i = 0; i < neigborhood.length; i++){
+			if (pheromoneAmount < neigborhood[i] && !this.nodeIsPresent(partialPath, i)){
+				nextNode = i;
+				pheromoneAmount = neigborhood[i];
+				nodeWasFind = true;
 			}
-			temp = 0;
-			size++;
 		}
-		return size;
+		
+		if (!nodeWasFind){
+			nextNode = partialPath[partialPath.length - 2];
+		}
+		
+		int[] newArray = Arrays.copyOf(partialPath, partialPath.length + 1);
+		newArray[partialPath.length] = nextNode;
+		
+		if (nextNode == this.destinationNode){
+			return newArray;
+		} else {			
+			return getBestPath(newArray, nextNode);
+		}
+	}
+	
+	private boolean nodeIsPresent(int[] nodes, int node){
+		for(int i = 0; i < nodes.length; i++){
+			if (nodes[i] == node){
+				return true;
+			}
+		}
+		return false;
 	}
 
+	public void reset() {
+		for (int i = 0; i < pheromoneTrail.length; i++) {
+			for (int j = 0; j < pheromoneTrail[i].length; j++) {
+				if (pheromoneTrail[i][j] > 0){
+					pheromoneTrail[i][j] = 1;
+				}
+			}
+		}
+		
+	}
+
+	public void putPheromone(int source, int destination) {
+		if (source == destination) {
+			throw new IllegalArgumentException("Node source must be different from the destination node [" + source + ", " + destination + "]");
+		}
+		if (source < 0 || destinationNode < 0) {
+			throw new IllegalArgumentException("The source node or destination node must be greater than zero.");			
+		}
+		if (source >= this.size || destination >= this.size) {
+			throw new IllegalArgumentException("The source node or destination node must be less than size.");			
+		}
+		
+		this.pheromoneTrail[source][destination] = 1;
+		this.pheromoneTrail[destination][source] = 1;
+	}
 }
