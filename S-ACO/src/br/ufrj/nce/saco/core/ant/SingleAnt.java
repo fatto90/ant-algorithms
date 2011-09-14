@@ -16,7 +16,7 @@ public class SingleAnt {
 	};
 	
 	private int lastPathSize;
-	private int alpha = 2;
+	private double alpha = 2;
 	private int targetNode;
 	private int sourceNode;
 	private int destinationNode;
@@ -75,11 +75,11 @@ public class SingleAnt {
 		this.path = path;
 	}
 
-	public int getAlpha() {
+	public double getAlpha() {
 		return alpha;
 	}
 
-	public void setAlpha(int alpha) {
+	public void setAlpha(double alpha) {
 		this.alpha = alpha;
 	}
 

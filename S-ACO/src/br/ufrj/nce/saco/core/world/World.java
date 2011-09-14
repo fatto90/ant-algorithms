@@ -8,17 +8,17 @@ import br.ufrj.nce.saco.core.pheromone.Pheromone;
 
 public class World {
 
+	private double alpha = 2;
+	private int antsAmount = 1;
+	private double evaporationRate = 0;
 	private boolean allLogsOn = false;
 	private boolean printAntTrack = false;
 	private boolean printBestPath = false;
 	private boolean pheromoneUpdateIsConstant = false;
-	private int alpha = 2;
-	private int antsAmount = 1;
-	private double evaporationRate = 0;
+	
+	private Random rand;
 	private SingleAnt[] ants;
 	private Pheromone pheromone;
-	private Random rand;
-	
 
 	public World() {
 		rand = new Random();
@@ -46,11 +46,11 @@ public class World {
 		this.antsAmount = antsAmount;
 	}
 
-	public int getAlpha() {
+	public double getAlpha() {
 		return alpha;
 	}
 
-	public void setAlpha(int alpha) {
+	public void setAlpha(double alpha) {
 		this.alpha = alpha;
 	}
 
