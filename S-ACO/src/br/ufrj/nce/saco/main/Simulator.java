@@ -1,7 +1,9 @@
 package br.ufrj.nce.saco.main;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.InputStreamReader;
 
 import br.ufrj.nce.saco.core.world.World;
@@ -15,6 +17,7 @@ public class Simulator {
 
 	public static void main(String[] args) throws Exception {
 		Simulator simulator = new Simulator();
+		BufferedWriter file = null;
 		simulator.setup();
 
 		int[] pathsSize = new int[3];
@@ -24,7 +27,8 @@ public class Simulator {
 
 		try {
 			time = System.currentTimeMillis();
-
+			file = new BufferedWriter(new FileWriter("resultado.txt"));
+				  
 			for (int i = 0; i < simulator.getSimulationTotal(); i++) {
 				simulator.execute(simulator.stepsTotal);
 				int pathSize = simulator.world.getBestPathSize();
@@ -36,19 +40,31 @@ public class Simulator {
 				}
 				simulator.world.reset();
 			}
-
-			System.out.println("Tempo total: " + (System.currentTimeMillis() - time) + " milisegundos.");
+			
+			file.write("Tempo total: " + (System.currentTimeMillis() - time) + " milisegundos.");
+			file.newLine();
 			for (int i = 0; i < pathsSize.length; i++) {
 				if (i > 0) {
-					System.out.println("Tamanho: " + i + " = " + (double) pathsSize[i] * 100 / simulator.getSimulationTotal()  + "%");
+					file.write("Tamanho: " + i + " = " + (double) pathsSize[i] * 100 / simulator.getSimulationTotal()  + "%");
+					file.newLine();
 				}
 			}
 
-			System.out.println("Total de simulações: " + simulator.getSimulationTotal());
-			System.out.println("Melhor caminho médio: " + (double) caminhoMedio / simulator.getSimulationTotal());
+			file.write("Total de simulacoes: " + simulator.getSimulationTotal());
+			file.newLine();
+			file.write("Melhor caminho medio: " + (double) caminhoMedio / simulator.getSimulationTotal());
+			file.newLine();
+			file.write("---------------------------------------------------------------------------------------");
+			file.newLine();
+			file.newLine();
+			
+			System.out.println("\n\nSimulacao concluida! Veja o resultado no arquivo resultado.txt");
 
 		} catch (Exception e) {
 			e.printStackTrace();
+			
+		} finally{
+			file.close();
 		}
 	}
 
@@ -60,12 +76,12 @@ public class Simulator {
 
 	private void setup() throws Exception {
 		this.world = this.getWorldStdin("Informe o nome do arquivo: ");
-		this.world.setAlpha(getDoubleStdin("Digite um valor numérico entre 1 e 2 para alfa: ", 1, 2));
-		this.world.setEvaporationRate(getDoubleStdin("Digite um valor numérico entre 0 e 1 para a taxa de evaporação de feromônio: ", 0, 1));
-		this.world.setPheromoneUpdateIsConstant(getBooleanStdin("O quantidade de feromônio depositada é constante? Digite S ou N: "));
+		this.world.setAlpha(getDoubleStdin("Digite um valor numerico entre 1 e 2 para alfa: ", 1, 2));
+		this.world.setEvaporationRate(getDoubleStdin("Digite um valor numerico entre 0 e 1 para a taxa de evaporacao de feromonio: ", 0, 1));
+		this.world.setPheromoneUpdateIsConstant(getBooleanStdin("O quantidade de feromonio depositada e constante? Digite S ou N: "));
 		this.world.createAnts(getIntegerStdin("Informe a quantidade de formigas. (Deve ser maior que zero.): ", 0, 1000000));
 		this.setStepsTotal(getIntegerStdin("Informe a quantidade de passos de cada formiga: (Deve ser maior que zero): ", 0, 1000000));
-		this.setSimulationTotal(getIntegerStdin("Informe a quantidade de simulações: (Deve ser maior que zero): ", 0, 1000000));
+		this.setSimulationTotal(getIntegerStdin("Informe a quantidade de simulacoes: (Deve ser maior que zero): ", 0, 1000000));
 
 		this.world.setAllLogsOn(Constants.PRINT_LOGS_ON);
 		this.world.setPrintAntTrack(Constants.PRINT_TRACK);
