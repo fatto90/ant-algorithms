@@ -35,9 +35,8 @@ public class Simulator {
 				caminhoMedio += pathSize;
 				pathsSize[pathSize]++;
 
-				if (Constants.PRINT_BEST_PATH) {
-					System.out.println("Melhor caminho: " + simulator.world.getBestPath());
-				}
+				//file.write("Simulação " + i + " - Melhor caminho: " + simulator.world.getBestPath());
+				//file.newLine();
 				simulator.world.reset();
 			}
 			
