@@ -1,10 +1,13 @@
 package br.ufrj.dcc.world;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Random;
 
 import br.ufrj.dcc.ant.Ant;
 import br.ufrj.dcc.util.Pheromone;
+import br.ufrj.dcc.util.Step;
 import br.ufrj.dcc.util.WorldMap;
 
 public class World {
@@ -14,9 +17,9 @@ public class World {
 	private Ant[] ants;
 	private Ant[] rank;
 	private Random rand;
-	//private int rankSize = 10;
+	private int rankSize = 10;
 	private Ant bestSoFar;
-	
+
 	public World(WorldMap worldMap) {
 		this.worldMap = worldMap;
 		ants = new Ant[worldMap.getSize()];
@@ -36,7 +39,7 @@ public class World {
 			ants[i] = new Ant(i + 1);
 		}
 	}
-	
+
 	public WorldMap getWorldMap() {
 		return this.worldMap;
 	}
@@ -124,6 +127,7 @@ public class World {
 	public void run() {
 		tourConstruction();
 		updatePheromone();
+		System.out.println(bestSoFar.toString());
 		resetAnts();
 	}
 
@@ -131,15 +135,29 @@ public class World {
 		for (int i = 0; i < ants.length; i++) {
 			ants[i].getPath().reset();
 		}
-		System.out.println("Melhor formiga 2: " + bestSoFar.getHomeNode() + " Caminho: " + bestSoFar.getPathLength());		
+		System.out.println("Melhor formiga 2: " + bestSoFar.getHomeNode() + " Caminho: " + bestSoFar.getPathLength());
 	}
 
 	private void updatePheromone() {
-		this.rank = this.ants;		
+		this.rank = this.ants;
 		Arrays.sort(rank);
-		
-		for (int i = 0; i < pheromone.size(); i++) {
-			
+
+		pheromone.evaporate();
+
+		for (int i = 0; i < rankSize - 1; i++) {
+			ArrayList<Step> steps = ants[i].getPath().getSteps();
+
+			for (Iterator<Step> iterator = steps.iterator(); iterator.hasNext();) {
+				Step step = iterator.next();
+				this.pheromone.addValue(step.getSource(), step.getDestination(), ants[i].dropPheromone() * (rankSize - i));
+			}
+		}
+
+		ArrayList<Step> steps = bestSoFar.getPath().getSteps();
+
+		for (Iterator<Step> iterator = steps.iterator(); iterator.hasNext();) {
+			Step step = iterator.next();
+			this.pheromone.addValue(step.getSource(), step.getDestination(), bestSoFar.dropPheromone() * rankSize);
 		}
 	}
 
@@ -150,27 +168,21 @@ public class World {
 				double pheromones[] = pheromone.getPheromones(j);
 				double sample = rand.nextDouble();
 				ants[j].move(distances, pheromones, sample);
+
+				if (i == ants.length - 1) {
+					int homeNode = ants[j].getHomeNode();
+					int currentNode = ants[j].getCurrentNode();
+					long distance = worldMap.getDistance(currentNode, homeNode);
+					ants[j].moveHomeNode(distance);
+
+					if (ants[j].getPath().size() != worldMap.getSize() + 1) {
+						throw new RuntimeException("Erro no caminho da formiga " + (j) + " Caminho de tamanho diferente da quantidade de cidades no mundo " + ants[j].getPath().size());
+					}
+					if (bestSoFar == null || bestSoFar.getPathLength() > ants[j].getPathLength()) {
+						bestSoFar = ants[j];
+					}
+				}
 			}
 		}
-		
-		for (int i = 0; i < ants.length; i++) {
-			int homeNode = ants[i].getHomeNode();
-			int currentNode = ants[i].getCurrentNode();
-			long distance = worldMap.getDistance(currentNode, homeNode);
-			ants[i].moveHomeNode(distance);
-			
-			if(ants[i].getPath().size() != worldMap.getSize() + 1){
-				throw new RuntimeException("Erro no caminho da formiga " + (i + 1) + " Caminho de tamanho diferente da quantidade de cidades no mundo " + ants[i].getPath().size());
-			}
-			if (bestSoFar == null || bestSoFar.getPathLength() > ants[i].getPathLength()){
-				bestSoFar = ants[i];
-			}			
-		}
-		/*
-		System.out.println("Melhor formiga: " + bestSoFar.getHomeNode());
-		System.out.println("Caminho melhor formiga: " + bestSoFar.getPathLength());
-		System.out.println(ants[bestSoFar.getHomeNode() - 1].getPath().getAllDistances());
-		System.out.println(ants[bestSoFar.getHomeNode() - 1].getPath().toString());
-		*/
 	}
 }

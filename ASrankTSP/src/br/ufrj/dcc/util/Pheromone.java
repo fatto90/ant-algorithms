@@ -23,7 +23,8 @@ public class Pheromone {
 	}
 	
 	public void addValue(int i, int j, double value){
-		this.pheromones[i][j] = this.pheromones[i][j] * (1 - this.rate) + value;
+		this.pheromones[i - 1][j - 1] += value;
+		this.pheromones[j - 1][i - 1] += value;
 	}
 	
 	
@@ -41,7 +42,7 @@ public class Pheromone {
 		this.pheromones[j][i] = value;
 	}
 	
-	public void evaporate(double rate){
+	public void evaporate(){
 		for (int i = 0; i < pheromones.length; i++) {
 			for (int j = 0; j < pheromones.length; j++) {
 				pheromones[i][j] = (1 - rate) * pheromones[i][j];

@@ -5,9 +5,10 @@ import br.ufrj.dcc.util.Path;
 public class Ant implements Comparable<Ant> {
 	
 	private int currentNode;
-	private Path path = null;
 	private int alpha = 1;
 	private int beta = 1;
+	
+	private Path path = null;
 	private Ant nextAnt;
 		
 	public Ant(int homeNode) {
@@ -103,5 +104,10 @@ public class Ant implements Comparable<Ant> {
 			return -1;
 			
 		}
+	}
+	
+	@Override
+	public String toString() {
+		return "[" + this.path.getStartNode() + "]" + this.path.getLength();
 	}
 }

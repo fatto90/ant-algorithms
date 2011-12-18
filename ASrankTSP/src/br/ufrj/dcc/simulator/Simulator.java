@@ -15,7 +15,7 @@ public class Simulator {
 		System.out.println("Busca Gulosa " + pathSize );
 		world.createPheromoneMatrix(pathSize);
 		
-		for(int i = 0; i < 25; i++){
+		for(int i = 0; i < 100; i++){
 			world.run();
 			
 		}

@@ -6,7 +6,7 @@ import java.util.Arrays;
 public class Path {
 	
 	private ArrayList<Integer> path = new ArrayList<Integer>();
-	private ArrayList<Long> distances = new ArrayList<Long>();
+	private ArrayList<Step> steps = new ArrayList<Step>();
 	
 	private int size = 0;
 	private long length = 0;
@@ -26,10 +26,11 @@ public class Path {
 	}
 
 	public void addNode(int node, long length){
+		int source = this.getLastNode();
+		steps.add(new Step(source, node, length));
 		this.path.add(node);
 		this.size += node;
 		this.length += length;
-		distances.add(length);
 	}
 	
 	public void getNode(int index){
@@ -37,7 +38,7 @@ public class Path {
 	}
 
 	public int getLastNode(){
-		return this.path.get(path.size());
+		return this.path.get(path.size() - 1);
 	}
 	
 	public int removeLastNode(){
@@ -50,14 +51,10 @@ public class Path {
 	
 	public void reset(){
 		this.path = new ArrayList<Integer>();
+		this.steps = new ArrayList<Step>();
 		this.path.add(this.startNode);
-		this.distances = new ArrayList<Long>();		
 		this.size = 0;
 		this.length = 0;
-	}
-	
-	public String getAllDistances(){
-		return Arrays.toString(distances.toArray());
 	}
 	
 	public String toString(){		
@@ -66,5 +63,9 @@ public class Path {
 	
 	public int size(){
 		return path.size();
+	}
+	
+	public ArrayList<Step> getSteps(){
+		return this.steps;
 	}
 }
