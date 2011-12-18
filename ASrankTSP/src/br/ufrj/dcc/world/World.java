@@ -1,16 +1,20 @@
 package br.ufrj.dcc.world;
 
+import java.util.Arrays;
 import java.util.Random;
 
 import br.ufrj.dcc.ant.Ant;
+import br.ufrj.dcc.util.Pheromone;
+import br.ufrj.dcc.util.WorldMap;
 
 public class World {
 
 	private WorldMap worldMap;
 	private Pheromone pheromone;
 	private Ant[] ants;
+	private Ant[] rank;
 	private Random rand;
-	private int rankSize = 10;
+	//private int rankSize = 10;
 	private Ant bestSoFar;
 	
 	public World(WorldMap worldMap) {
@@ -19,7 +23,7 @@ public class World {
 		this.rand = new Random();
 
 		for (int i = 0; i < ants.length; i++) {
-			ants[i] = new Ant(i);
+			ants[i] = new Ant(i + 1);
 		}
 	}
 
@@ -29,7 +33,7 @@ public class World {
 		this.rand = new Random(seed);
 
 		for (int i = 0; i < ants.length; i++) {
-			ants[i] = new Ant(i);
+			ants[i] = new Ant(i + 1);
 		}
 	}
 	
@@ -120,37 +124,53 @@ public class World {
 	public void run() {
 		tourConstruction();
 		updatePheromone();
+		resetAnts();
+	}
+
+	private void resetAnts() {
+		for (int i = 0; i < ants.length; i++) {
+			ants[i].getPath().reset();
+		}
+		System.out.println("Melhor formiga 2: " + bestSoFar.getHomeNode() + " Caminho: " + bestSoFar.getPathLength());		
 	}
 
 	private void updatePheromone() {
-		// TODO Auto-generated method stub
+		this.rank = this.ants;		
+		Arrays.sort(rank);
+		
+		for (int i = 0; i < pheromone.size(); i++) {
+			
+		}
 	}
 
 	private void tourConstruction() {
-		for (int i = 0; i < worldMap.getSize(); i++) {
+		for (int i = 1; i < worldMap.getSize(); i++) {
 			for (int j = 0; j < ants.length; j++) {
 				long distances[] = worldMap.getDistances(ants[j].getCurrentNode());
 				double pheromones[] = pheromone.getPheromones(j);
 				double sample = rand.nextDouble();
-				long v = ants[j].move(distances, pheromones, sample);		
-				if (v < 0){
-					System.out.println("Deu merda");
-				}
+				ants[j].move(distances, pheromones, sample);
 			}
-		}
-		
-		for (int j = 0; j < ants.length; j++) {
-			int homeNode = ants[j].getHomeNode();
-			int currentNode = ants[j].getCurrentNode();
-			long distance = worldMap.getDistance(currentNode, homeNode);
-			ants[j].moveHomeNode(distance);			
 		}
 		
 		for (int i = 0; i < ants.length; i++) {
+			int homeNode = ants[i].getHomeNode();
+			int currentNode = ants[i].getCurrentNode();
+			long distance = worldMap.getDistance(currentNode, homeNode);
+			ants[i].moveHomeNode(distance);
+			
+			if(ants[i].getPath().size() != worldMap.getSize() + 1){
+				throw new RuntimeException("Erro no caminho da formiga " + (i + 1) + " Caminho de tamanho diferente da quantidade de cidades no mundo " + ants[i].getPath().size());
+			}
 			if (bestSoFar == null || bestSoFar.getPathLength() > ants[i].getPathLength()){
 				bestSoFar = ants[i];
-			}
+			}			
 		}
-		
+		/*
+		System.out.println("Melhor formiga: " + bestSoFar.getHomeNode());
+		System.out.println("Caminho melhor formiga: " + bestSoFar.getPathLength());
+		System.out.println(ants[bestSoFar.getHomeNode() - 1].getPath().getAllDistances());
+		System.out.println(ants[bestSoFar.getHomeNode() - 1].getPath().toString());
+		*/
 	}
 }

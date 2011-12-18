@@ -1,13 +1,25 @@
-package br.ufrj.dcc.world;
+package br.ufrj.dcc.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Path {
 	
 	private ArrayList<Integer> path = new ArrayList<Integer>();
+	private ArrayList<Long> distances = new ArrayList<Long>();
+	
 	private int size = 0;
 	private long length = 0;
+	private int startNode = 0;
 	
+	public Path(int startNode) {
+		this.startNode = startNode;
+		path.add(startNode);
+	}
+	
+	public int getStartNode(){
+		return this.startNode;
+	}
 	
 	public long getLength() {
 		return length;
@@ -17,13 +29,9 @@ public class Path {
 		this.path.add(node);
 		this.size += node;
 		this.length += length;
+		distances.add(length);
 	}
 	
-	public void addNode(int node){
-		this.path.add(node);
-		this.size += node;
-	}
-
 	public void getNode(int index){
 		this.path.get(index);
 	}
@@ -42,7 +50,21 @@ public class Path {
 	
 	public void reset(){
 		this.path = new ArrayList<Integer>();
+		this.path.add(this.startNode);
+		this.distances = new ArrayList<Long>();		
 		this.size = 0;
 		this.length = 0;
+	}
+	
+	public String getAllDistances(){
+		return Arrays.toString(distances.toArray());
+	}
+	
+	public String toString(){		
+		return Arrays.toString(this.path.toArray());
+	}
+	
+	public int size(){
+		return path.size();
 	}
 }
