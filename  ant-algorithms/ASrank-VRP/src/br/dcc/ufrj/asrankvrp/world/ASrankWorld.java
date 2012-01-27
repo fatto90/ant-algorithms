@@ -33,7 +33,7 @@ public class ASrankWorld extends World {
 	public void createAnts(int total) {
 		this.ants = new ArrayList<Ant>();
 		for (int i = 0; i < total; i++) {
-			this.ants.add(new ASrankAnt(i, this.getFirstDepot(), this.getCapacity()));
+			this.ants.add(new ASrankAnt(i, this.getFirstDepot(), this.getCapacity(), this.getDimension()));
 		}
 		
 		this.rankSize = total / 5;
@@ -43,30 +43,18 @@ public class ASrankWorld extends World {
 	protected void tourConstruction() throws Exception{
 		City currCity = null;
 		City nextCity = null;
-//		long sumMoveTime = 0;
-	//	long moves = 0;
 
 		for (Ant ant : ants) {
 			ant.resetPath();
-
-			currCity = ant.getCurrentCity();
 			
-			//long t1 = System.currentTimeMillis();
-			nextCity = ant.chooseNextMove(currCity, this.getSampleDouble());
-		//	sumMoveTime += System.currentTimeMillis() - t1;
-			//moves++;
-			
-			while (nextCity != null) {
-				nextCity = this.getCity(nextCity);
-				ant.walk(nextCity);
+			do {
 				currCity = ant.getCurrentCity();				
-				
-				//long t3 = System.currentTimeMillis();
 				nextCity = ant.chooseNextMove(currCity, this.getSampleDouble());
-				//sumMoveTime += System.currentTimeMillis() - t3;
-				//moves++;
-				
-			}
+				if (nextCity != null){
+					nextCity = this.getCity(nextCity.getId());
+					ant.walk(nextCity);
+				}
+			} while (nextCity != null);				
 			
 			ant.walk(ant.getHomeCity());
 			
@@ -75,18 +63,8 @@ public class ASrankWorld extends World {
 				bestTour = ant.getPath();
 			}
 		}
-		//System.out.println("Move time: " + sumMoveTime + " - Average move time: " + ((double)sumMoveTime / moves) + " - Moves: " + moves);
 	}
-
-	private City getCity(City nextCity) {
-		for (City city : this.getCities()) {
-			if (city.getId() == nextCity.getId()) {
-				return city;
-			}
-		}
-		return null;
-	}
-
+	
 	@Override
 	protected void pheromoneUpdate() {
 		City lastPathCity = null;
@@ -108,7 +86,6 @@ public class ASrankWorld extends World {
 			lastPathCity = j;
 		}
 		
-		
 		lastPathCity = null;		
  
 		for (int r = 1; r < w; r++) {
@@ -123,11 +100,6 @@ public class ASrankWorld extends World {
 				lastPathCity = pathCity;
 			}
 		}
-	}
-
-	@Override
-	protected void setup() {
-		// TODO Auto-generated method stub
 	}
 
 	@Override

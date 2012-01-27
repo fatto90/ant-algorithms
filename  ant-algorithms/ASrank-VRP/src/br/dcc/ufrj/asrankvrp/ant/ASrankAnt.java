@@ -7,8 +7,8 @@ import br.dcc.ufrj.antvrp.world.City;
 
 public class ASrankAnt extends Ant {
 
-	public ASrankAnt(int id,City homeCity, int capacity) {
-		super(id, homeCity, capacity);
+	public ASrankAnt(int id,City homeCity, int capacity, int dimension) {
+		super(id, homeCity, capacity, dimension);
 	}
 
 	@Override
@@ -19,35 +19,24 @@ public class ASrankAnt extends Ant {
 		double sum = 0;
 		int size = neighbors.size() / 4;
 		int totalIterations = 0;
-		double[] probabilities = null;
 		
 		for (int i = 0, j = 0; j < size && i < neighbors.size(); i++) {
 			neighbor = neighbors.get(i);			
-			if (!this.pathContains(neighbor)){
-				sum += neighbor.getAlphaPheromone() * neighbor.getBetaHeuristic();
+			if (!this.isCityVisited(neighbor)){
+				sum += neighbor.getAtractivity();
 				j++;
 			}
 			totalIterations++;
-		}		
-		
-		probabilities = new double[totalIterations];
-
-		for (int i = 0; i < probabilities.length; i++) {
-			neighbor = neighbors.get(i);
-			if (!this.pathContains(neighbor)){
-				probabilities[i] = neighbor.getAlphaPheromone() * neighbor.getBetaHeuristic() / sum;
-			}
 		}
 		
-		for (int i = 0; i < probabilities.length; i++) {
+		for (int i = 0; i < totalIterations; i++) {
 			neighbor = neighbors.get(i);
 			
-			if (!this.pathContains(neighbor)){
-				acumulator += probabilities[i];
+			if (!this.isCityVisited(neighbor)){
+				acumulator += neighbor.getAtractivity() / sum;
 			}
 			
 			if (acumulator > sample){
-				
 				if (this.capacityCurrentValue - neighbor.getDemand() >= 0){
 					return neighbor;
 				} else {
@@ -56,7 +45,6 @@ public class ASrankAnt extends Ant {
 				}
 			}
 		}
-		
 		return null;
 	}
 
