@@ -12,34 +12,40 @@ public class ASrankAnt extends Ant {
 	}
 
 	@Override
-	public City nextMove(City city, double sample) {
+	public City chooseNextMove(City city, double sample) {
 		ArrayList<City> neighbors = city.getNeighbors();
 		City neighbor = null;
 		double acumulator = 0;
-		double[] probabilities = new double[neighbors.size()];
 		double sum = 0;
+		int size = neighbors.size() / 4;
+		int totalIterations = 0;
+		double[] probabilities = null;
 		
-		//TODO corrigir a busca pelo proximo nó... 
-		//a formiga está terminando o tour antes da hora...
+		for (int i = 0, j = 0; j < size && i < neighbors.size(); i++) {
+			neighbor = neighbors.get(i);			
+			if (!this.pathContains(neighbor)){
+				sum += neighbor.getAlphaPheromone() * neighbor.getBetaHeuristic();
+				j++;
+			}
+			totalIterations++;
+		}		
 		
-		for (int i = 0; i < neighbors.size() / 4; i++) {
+		probabilities = new double[totalIterations];
+
+		for (int i = 0; i < probabilities.length; i++) {
+			neighbor = neighbors.get(i);
+			if (!this.pathContains(neighbor)){
+				probabilities[i] = neighbor.getAlphaPheromone() * neighbor.getBetaHeuristic() / sum;
+			}
+		}
+		
+		for (int i = 0; i < probabilities.length; i++) {
 			neighbor = neighbors.get(i);
 			
 			if (!this.pathContains(neighbor)){
-				sum += neighbor.getAlphaPheromone() * neighbor.getBetaHeuristic();			
+				acumulator += probabilities[i];
 			}
-		}
-
-		for (int i = 0; i < neighbors.size() / 4; i++) {
-			neighbor = neighbors.get(i);
-			if (!this.pathContains(neighbor)){
-				probabilities[i] = neighbor.getAlphaPheromone() * neighbor.getBetaHeuristic() / sum;			
-			}
-		}
-		
-		for (int i = 0; i < neighbors.size() / 4; i++) {
-			neighbor = neighbors.get(i);
-			acumulator += probabilities[i];
+			
 			if (acumulator > sample){
 				
 				if (this.capacityCurrentValue - neighbor.getDemand() >= 0){
@@ -55,9 +61,8 @@ public class ASrankAnt extends Ant {
 	}
 
 	@Override
-	public double dropPheromone() {
-		// TODO Auto-generated method stub
-		return 0;
+	public double dropPheromone() {		
+		return 1 / this.getTourLength();
 	}
 
 }
