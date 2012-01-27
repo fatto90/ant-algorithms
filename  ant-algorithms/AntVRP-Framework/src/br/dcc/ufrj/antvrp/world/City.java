@@ -32,6 +32,7 @@ public class City implements Cloneable{
 	protected City clone() throws CloneNotSupportedException {
 		City city = new City(this.id, this.lat, this.lon);
 		city.distance = this.distance;
+		city.heuristic = this.heuristic;
 		city.pheromone = this.pheromone;
 		city.alphaPheromone = this.alphaPheromone;
 		city.betaHeuristic = this.betaHeuristic;		
@@ -43,29 +44,33 @@ public class City implements Cloneable{
 	public void addNeigbour(City newNeighbor) {
 		City neighbor = null;
 		double distance = 0;
-		//double betaHeuristic = 0;
 		
 		if (newNeighbor.getId() == this.id){
 			return;
 		}
 		
 		try{
-			distance = calculateDistance(this, newNeighbor); 
-			newNeighbor.setDistance(distance);
-			//betaHeuristic = Math.pow(this.heuristic, this.beta);
-			//newNeighbor.setBetaHeuristic(betaHeuristic);
-
+			distance = calculateDistance(this, newNeighbor);
+			
 			for (int i = 0; i < neighbors.size(); i++) {
 				neighbor = neighbors.get(i);
 				
-				if (newNeighbor.getDistance() < neighbor.getDistance()){
-					neighbors.add(i, newNeighbor.clone());				
+				if (distance < neighbor.getDistance()){
+					
+					City nextNeighbor = newNeighbor.clone();
+					nextNeighbor.setDistance(distance);
+					
+					neighbors.add(i, nextNeighbor);				
 					return;
 				}
 			}
 			
-			if (neighbor == null || newNeighbor.getDistance() >= neighbor.getDistance()){
-				neighbors.add(newNeighbor.clone());				
+			if (neighbor == null || distance >= neighbor.getDistance()){
+				
+				City nextNeighbor = newNeighbor.clone();
+				nextNeighbor.setDistance(distance);
+				
+				neighbors.add(nextNeighbor);				
 			}
 			
 		} catch (Exception e) {
@@ -76,6 +81,7 @@ public class City implements Cloneable{
 	
 	public void setPheromone(double pheromone) {
 		this.pheromone = pheromone;
+		this.alphaPheromone = Math.pow(pheromone, alpha);
 	}
 	
 	public double calculateDistance(City city, City neighbor){
@@ -132,11 +138,11 @@ public class City implements Cloneable{
 	public double getBetaHeuristic() {
 		return betaHeuristic;
 	}
-
+/*
 	public void setBetaHeuristic(double betaHeuristic) {
 		this.betaHeuristic = betaHeuristic;
 	}
-
+*/
 	public double getAlphaPheromone() {
 		return alphaPheromone;
 	}
@@ -182,7 +188,17 @@ public class City implements Cloneable{
 	}
 
 	public void setHeuristic(double heuristic) {
-		this.heuristic = heuristic;
+		this.heuristic = heuristic;		
+		this.betaHeuristic = Math.pow(heuristic, beta);
+	}
+	
+	@Override
+	public String toString() {		
+		return String.valueOf(this.id);
 	}
 
+	public void evapore(double tax) {
+		this.pheromone = this.pheromone * (1 - tax);
+		this.alphaPheromone = Math.pow(this.pheromone, alpha);
+	}
 }
