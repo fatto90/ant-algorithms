@@ -37,6 +37,16 @@ public abstract class World {
 	private static final String TAG_DEMAND_SECTION = "DEMAND_SECTION";
 	private static final String TAG_DEPOT_SECTION = "DEPOT_SECTION";
 	private static final String TAG_EOF = "EOF";
+	
+	protected abstract void createAnts(int total);
+
+	protected abstract void tourConstruction() throws Exception;
+
+	protected abstract void pheromoneUpdate();
+
+	protected abstract double getInitialPathSize();
+
+	protected abstract void computeHeuristics();
 
 	public World() {
 		this.seed = new Random().nextLong();
@@ -47,18 +57,6 @@ public abstract class World {
 		this.seed = seed;
 		this.random = new Random(this.seed);
 	}
-
-	protected abstract void createAnts(int total);
-
-	protected abstract void tourConstruction() throws Exception;
-
-	protected abstract void pheromoneUpdate();
-
-	protected abstract void setup();
-
-	protected abstract double getInitialPathSize();
-
-	protected abstract void computeHeuristics();
 
 	public void createWorld(String path) throws Exception {
 		BufferedReader reader = new BufferedReader(new FileReader(path));
@@ -82,28 +80,16 @@ public abstract class World {
 	}
 
 	protected void addPheromone(City a, City b, double pheromone) {
+		City na =  a.getNeighborById(b.getId());
+		na.setPheromone(pheromone + na.getPheromone());
 
-		for (City i : a.getNeighbors()) {
-			if (i.getId() == b.getId()) {
-				i.setPheromone(pheromone + i.getPheromone());
-				break;
-			}
-		}
-
-		for (City i : b.getNeighbors()) {
-			if (i.getId() == a.getId()) {
-				i.setPheromone(pheromone + i.getPheromone());
-				break;
-			}
-		}
+		City nb =  b.getNeighborById(a.getId());
+		nb.setPheromone(pheromone + nb.getPheromone());
 	}
 
 	public void run() throws Exception {
-		//long cTime = System.currentTimeMillis();
 		this.tourConstruction();
-		//System.out.println("Construction time: " + (System.currentTimeMillis() - cTime));
 		this.pheromoneUpdate();
-		this.setup();
 	}
 
 	public void createPheromones(double initialValue) {
@@ -370,4 +356,9 @@ public abstract class World {
 	public long getSeed() {
 		return seed;
 	}
+	
+	public City getCity(int cityId) {		
+		return this.cities.get(cityId - 1);
+	}
+
 }

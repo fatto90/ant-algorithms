@@ -16,16 +16,20 @@ public class City implements Cloneable{
 	private double distance;	
 	private double betaHeuristic;
 	private double alphaPheromone;
+	private double atractivity;
+	
 	
 	private boolean depot;
 	
 	private ArrayList<City> neighbors;
+	private ArrayList<City> neighborsOrderedById;
 	
 	public City(int id, int lat, int lon) {
 		this.id = id;
 		this.lat = lat;
 		this.lon = lon;
 		this.neighbors = new ArrayList<City>();
+		this.neighborsOrderedById = new ArrayList<City>();
 	}
 	
 	@Override
@@ -38,6 +42,7 @@ public class City implements Cloneable{
 		city.betaHeuristic = this.betaHeuristic;		
 		city.demand = this.demand;
 		city.depot = this.depot;
+		city.atractivity = this.atractivity;
 		return city;
 	}
 	
@@ -45,33 +50,35 @@ public class City implements Cloneable{
 		City neighbor = null;
 		double distance = 0;
 		
-		if (newNeighbor.getId() == this.id){
-			return;
-		}
 		
 		try{
+			if (newNeighbor.getId() == this.id){
+				City nextNeighbor = newNeighbor.clone();
+				nextNeighbor.setDistance(0);
+				neighborsOrderedById.add(nextNeighbor);
+				return;
+			}
+			
 			distance = calculateDistance(this, newNeighbor);
+			City nextNeighbor = newNeighbor.clone();
 			
 			for (int i = 0; i < neighbors.size(); i++) {
 				neighbor = neighbors.get(i);
 				
 				if (distance < neighbor.getDistance()){
-					
-					City nextNeighbor = newNeighbor.clone();
 					nextNeighbor.setDistance(distance);
-					
-					neighbors.add(i, nextNeighbor);				
+					neighbors.add(i, nextNeighbor);
+					neighborsOrderedById.add(nextNeighbor);
 					return;
 				}
 			}
 			
 			if (neighbor == null || distance >= neighbor.getDistance()){
-				
-				City nextNeighbor = newNeighbor.clone();
 				nextNeighbor.setDistance(distance);
-				
-				neighbors.add(nextNeighbor);				
+				neighbors.add(nextNeighbor);
+				neighborsOrderedById.add(nextNeighbor);
 			}
+			
 			
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
@@ -82,11 +89,10 @@ public class City implements Cloneable{
 	public void setPheromone(double pheromone) {
 		this.pheromone = pheromone;
 		this.alphaPheromone = Math.pow(pheromone, alpha);
+		this.atractivity = alphaPheromone * betaHeuristic;
 	}
 	
 	public double calculateDistance(City city, City neighbor){
-		//return Math.sqrt(Math.pow((city.getLat() - neighbor.getLat()), 2) + Math.pow(city.getLon() - neighbor.getLon(), 2));
-		
 		double lon = city.getLon() - neighbor.getLon();
 		double lat = city.getLat() - neighbor.getLat();
 		return Math.hypot(lon, lat);
@@ -97,18 +103,11 @@ public class City implements Cloneable{
 	}
 
 	public double getDistance(int idCity) {
-		
 		if (this.id == idCity){
 			return 0;
+		} else {
+			return this.neighborsOrderedById.get(idCity - 1).getDistance();
 		}
-		
-		for(City neighbor: this.neighbors){
-			if (neighbor.getId() == idCity){
-				return neighbor.getDistance();
-			}			
-		}
-		
-		return -1;
 	}
 
 	public void setDistance(double distance) {
@@ -138,17 +137,9 @@ public class City implements Cloneable{
 	public double getBetaHeuristic() {
 		return betaHeuristic;
 	}
-/*
-	public void setBetaHeuristic(double betaHeuristic) {
-		this.betaHeuristic = betaHeuristic;
-	}
-*/
+
 	public double getAlphaPheromone() {
 		return alphaPheromone;
-	}
-
-	public void setAlphaPheromone(double alphaPheromone) {
-		this.alphaPheromone = alphaPheromone;
 	}
 
 	public int getAlpha() {
@@ -200,5 +191,18 @@ public class City implements Cloneable{
 	public void evapore(double tax) {
 		this.pheromone = this.pheromone * (1 - tax);
 		this.alphaPheromone = Math.pow(this.pheromone, alpha);
+		this.atractivity = alphaPheromone * betaHeuristic;
+	}
+
+	public ArrayList<City> getNeighborsOrderedById() {
+		return neighborsOrderedById;
+	}
+	
+	public City getNeighborById(int cityId) {
+		return this.getNeighborsOrderedById().get(cityId - 1);
+	}
+
+	public double getAtractivity() {
+		return atractivity;
 	}
 }

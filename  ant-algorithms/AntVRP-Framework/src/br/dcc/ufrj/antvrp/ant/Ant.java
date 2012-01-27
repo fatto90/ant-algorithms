@@ -9,21 +9,26 @@ public abstract class Ant implements Comparable<Ant> {
 	private int id;
 	private City homeCity;
 	private ArrayList<City> path;
+	private boolean []visitedCities;
 	protected int capacityInitialValue = 0;
 	protected int capacityCurrentValue = 0;
 	private double tourLength = 0;
+	private int dimension = 0;
 
 	public abstract City chooseNextMove(City city, double sample);
 
 	public abstract double dropPheromone();
 
-	public Ant(int id, City homeCity, int capacity) {
+	public Ant(int id, City homeCity, int capacity, int dimension) {
 		path = new ArrayList<City>();
 		this.id = id;
 		this.homeCity = homeCity;
 		this.path.add(homeCity);
 		this.capacityInitialValue = capacity;		
-		this.capacityCurrentValue = capacity;		
+		this.capacityCurrentValue = capacity;
+		this.dimension = dimension;
+		this.visitedCities = new boolean[dimension];
+		this.visitedCities[homeCity.getId() - 1] = true;
 	}
 
 	public int getId() {
@@ -42,6 +47,7 @@ public abstract class Ant implements Comparable<Ant> {
 		this.tourLength += this.getCurrentCity().getDistance(city.getId()); 
 		this.path.add(city);		
 		this.capacityCurrentValue -= city.getDemand();
+		this.visitedCities[city.getId() - 1] = true;		
 	}
 
 	public void resetPath() {
@@ -49,6 +55,8 @@ public abstract class Ant implements Comparable<Ant> {
 		this.path.add(homeCity);
 		this.capacityCurrentValue = this.capacityInitialValue;
 		this.tourLength = 0;
+		this.visitedCities = new boolean[this.dimension];
+		this.visitedCities[this.homeCity.getId() - 1] = true;
 	}
 
 	public int compareTo(Ant ant) {
@@ -79,5 +87,9 @@ public abstract class Ant implements Comparable<Ant> {
 
 	public double getTourLength() {
 		return tourLength;
+	}
+	
+	public boolean isCityVisited(City city){
+		return this.visitedCities[city.getId() - 1];
 	}
 }
