@@ -10,8 +10,6 @@ import br.dcc.ufrj.asrankvrp.ant.ASrankAnt;
 
 public class ASrankWorld extends World {
 
-	private double bestTourSize = 0;
-	private ArrayList<City> bestTour;
 	private int fParam = 2;
 	private int gParam = 2;
 	private static double RO = 0.1; 
@@ -48,7 +46,7 @@ public class ASrankWorld extends World {
 			ant.resetPath();
 			
 			do {
-				currCity = ant.getCurrentCity();				
+				currCity = ant.getPath().getCurrentCity();				
 				nextCity = ant.chooseNextMove(currCity, this.getSampleDouble());
 				if (nextCity != null){
 					nextCity = this.getCity(nextCity.getId());
@@ -58,9 +56,9 @@ public class ASrankWorld extends World {
 			
 			ant.walk(ant.getHomeCity());
 			
-			if (bestTourSize > ant.getTourLength() || bestTourSize == 0){
-				bestTourSize = ant.getTourLength();
-				bestTour = ant.getPath();
+			if (this.getBestTourSize() > ant.getTourLength() || this.getBestTourSize() == 0){
+				this.setBestTourSize(ant.getTourLength());
+				this.setBestTour(ant.getPath());
 			}
 		}
 	}
@@ -79,9 +77,9 @@ public class ASrankWorld extends World {
 			}
 		}
 		
-		for(City j: this.bestTour){
+		for(City j: this.getBestTour().getCities()){
 			if (lastPathCity != null){
-				this.addPheromone(lastPathCity, j, (double)w / (double)bestTourSize);				
+				this.addPheromone(lastPathCity, j, (double)w / (double) this.getBestTourSize());				
 			}
 			lastPathCity = j;
 		}
@@ -91,7 +89,7 @@ public class ASrankWorld extends World {
 		for (int r = 1; r < w; r++) {
 			Ant ant = (Ant) rank[r - 1];
 			
-			for (City pathCity : ant.getPath()) {				
+			for (City pathCity : ant.getPath().getCities()) {				
 				if (lastPathCity != null){
 					pheromone = ant.dropPheromone() * (w - r);
 					this.addPheromone(lastPathCity, pathCity, pheromone);
@@ -146,14 +144,6 @@ public class ASrankWorld extends World {
 				neighbor.setHeuristic(heuristic);
 			}
 		}
-	}
-
-	public double getBestTourSize() {
-		return bestTourSize;
-	}
-
-	public ArrayList<City> getBestTour() {
-		return bestTour;
 	}
 
 	public int getRankSize() {
