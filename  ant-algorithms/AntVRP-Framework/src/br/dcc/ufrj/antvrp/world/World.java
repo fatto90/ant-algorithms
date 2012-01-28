@@ -3,11 +3,13 @@ package br.dcc.ufrj.antvrp.world;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 import br.dcc.ufrj.antvrp.ant.Ant;
 import br.dcc.ufrj.antvrp.exception.IllegalArgumentWorldException;
 import br.dcc.ufrj.antvrp.pheromone.Pheromone;
+import br.dcc.ufrj.antvrp.util.Path;
 import br.dcc.ufrj.antvrp.util.Util;
 
 public abstract class World {
@@ -15,17 +17,20 @@ public abstract class World {
 	private int dimension;
 	private int capacity;
 	private int[] demands;
-	protected ArrayList<City> cities;
+	private long seed;
+	private double bestTourSize = 0;
+
 	private String name;
 	private String comment;
 	private String type;
 	private String edgeWeightType;
-	private long seed;
-
-	private Random random;
 
 	protected ArrayList<Ant> ants;
+	protected ArrayList<City> cities;
+	private Path bestTour;
+
 	protected Pheromone pheromone;
+	private Random random;
 
 	private static final String TAG_NAME = "NAME";
 	private static final String TAG_COMMENT = "COMMENT";
@@ -37,7 +42,7 @@ public abstract class World {
 	private static final String TAG_DEMAND_SECTION = "DEMAND_SECTION";
 	private static final String TAG_DEPOT_SECTION = "DEPOT_SECTION";
 	private static final String TAG_EOF = "EOF";
-	
+
 	protected abstract void createAnts(int total);
 
 	protected abstract void tourConstruction() throws Exception;
@@ -80,10 +85,10 @@ public abstract class World {
 	}
 
 	protected void addPheromone(City a, City b, double pheromone) {
-		City na =  a.getNeighborById(b.getId());
+		City na = a.getNeighborById(b.getId());
 		na.setPheromone(pheromone + na.getPheromone());
 
-		City nb =  b.getNeighborById(a.getId());
+		City nb = b.getNeighborById(a.getId());
 		nb.setPheromone(pheromone + nb.getPheromone());
 	}
 
@@ -356,9 +361,118 @@ public abstract class World {
 	public long getSeed() {
 		return seed;
 	}
-	
-	public City getCity(int cityId) {		
+
+	public City getCity(int cityId) {
 		return this.cities.get(cityId - 1);
+	}
+
+	public double getBestTourSize() {
+		return bestTourSize;
+	}
+
+	public Path getBestTour() {
+		return bestTour;
+	}
+
+	public double pathLength(String route) {
+		double length = 0;
+		String[] teste = route.split(",");
+		City c1 = null;
+		City c2 = null;
+		
+		c1 = this.getCity(Integer.parseInt(teste[0]));
+		for (int i = 1; i < teste.length; i++) {
+			c2 = this.getCity(Integer.parseInt(teste[i]));
+			length += Util.hypot(c1, c2);
+			c1 = c2;
+		}
+		
+		return length;
+	}
+
+	public ArrayList<City> opt2() {
+		String bestTour = Arrays.toString(getBestTour().getCities().toArray());
+		bestTour = bestTour.substring(4, bestTour.length() - 4).replace(" ", "");/*
+		String slice1 = "";
+		String slice2 = "";
+		String slice3 = "";*/
+
+		double abDistance = 0;
+		double acDistance = 0;
+		double cdDistance = 0;
+		double bdDistance = 0;
+
+		City aCity = null;
+		City bCity = null;
+		City cCity = null;
+		City dCity = null;
+
+		String[] routes = bestTour.split(",1,");
+
+		for (int r = 0; r < routes.length; r++) {
+			String route = routes[r] + ",";
+
+			int t = route.indexOf(',', 0);
+			aCity = this.getCity(Integer.parseInt(route.substring(0, t)));
+
+			for (int i = t + 1, j = 0; i < route.length();) {
+				j = route.indexOf(',', i);
+				bCity = this.getCity(Integer.parseInt(route.substring(i, j)));
+				abDistance = Util.hypot(aCity, bCity);
+				t = route.indexOf(',', j + 1);
+				cCity = this.getCity(Integer.parseInt(route.substring(j + 1, t)));
+
+				for (int u = t + 1, v = 0; u < route.length();) {
+
+					v = route.indexOf(',', u);
+					dCity = this.getCity(Integer.parseInt(route.substring(u, v)));
+
+					acDistance = Util.hypot(aCity, cCity);
+					cdDistance = Util.hypot(cCity, dCity);
+					bdDistance = Util.hypot(bCity, dCity);
+
+					if (abDistance + cdDistance > acDistance + bdDistance) {
+						System.out.println("Slice1: " + route.substring(0, i));
+						System.out.println("Slice2: " + route.substring(i, u));
+						System.out.println("Slice3: " + route.substring(u, route.length()));
+					}
+
+					u = v + 1;
+					cCity = dCity;
+
+				}
+
+				aCity = bCity;
+				i = j + 1;
+			}
+
+		}
+		
+		
+
+		return null;
+
+	}
+	
+	public String invertRoute(String route){
+		
+		String[] cities = route.split(",");
+		String result = "";
+		
+		for(int i = cities.length - 1; i >= 0; i--){
+			result = result.concat(cities[i]).concat(",");
+		}
+		
+		return result.substring(0, result.length() - 1);
+	}
+
+
+	public void setBestTourSize(double bestTourSize) {
+		this.bestTourSize = bestTourSize;
+	}
+
+	public void setBestTour(Path bestTour) {
+		this.bestTour = bestTour;
 	}
 
 }

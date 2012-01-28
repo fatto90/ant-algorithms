@@ -2,6 +2,8 @@ package br.dcc.ufrj.antvrp.world;
 
 import java.util.ArrayList;
 
+import br.dcc.ufrj.antvrp.util.Util;
+
 public class City implements Cloneable{
 	
 	private int lat;
@@ -59,7 +61,7 @@ public class City implements Cloneable{
 				return;
 			}
 			
-			distance = calculateDistance(this, newNeighbor);
+			distance = Util.hypot(this, newNeighbor);
 			City nextNeighbor = newNeighbor.clone();
 			
 			for (int i = 0; i < neighbors.size(); i++) {
@@ -92,12 +94,6 @@ public class City implements Cloneable{
 		this.atractivity = alphaPheromone * betaHeuristic;
 	}
 	
-	public double calculateDistance(City city, City neighbor){
-		double lon = city.getLon() - neighbor.getLon();
-		double lat = city.getLat() - neighbor.getLat();
-		return Math.hypot(lon, lat);
-	}
-
 	public double getDistance() {
 		return distance;
 	}

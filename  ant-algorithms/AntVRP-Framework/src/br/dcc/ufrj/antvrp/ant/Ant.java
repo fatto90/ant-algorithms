@@ -1,14 +1,14 @@
 package br.dcc.ufrj.antvrp.ant;
 
-import java.util.ArrayList;
-
+import br.dcc.ufrj.antvrp.util.Path;
 import br.dcc.ufrj.antvrp.world.City;
 
 public abstract class Ant implements Comparable<Ant> {
 
 	private int id;
 	private City homeCity;
-	private ArrayList<City> path;
+	//private ArrayList<City> path;
+	private Path path; 
 	private boolean []visitedCities;
 	protected int capacityInitialValue = 0;
 	protected int capacityCurrentValue = 0;
@@ -20,10 +20,9 @@ public abstract class Ant implements Comparable<Ant> {
 	public abstract double dropPheromone();
 
 	public Ant(int id, City homeCity, int capacity, int dimension) {
-		path = new ArrayList<City>();
+		path = new Path(homeCity);
 		this.id = id;
 		this.homeCity = homeCity;
-		this.path.add(homeCity);
 		this.capacityInitialValue = capacity;		
 		this.capacityCurrentValue = capacity;
 		this.dimension = dimension;
@@ -39,20 +38,15 @@ public abstract class Ant implements Comparable<Ant> {
 		return homeCity;
 	}
 
-	public City getCurrentCity() {
-		return path.get(path.size() - 1);
-	}
-
 	public void walk(City city) {
-		this.tourLength += this.getCurrentCity().getDistance(city.getId()); 
+		this.tourLength += this.path.getCurrentCity().getDistance(city.getId()); 
 		this.path.add(city);		
 		this.capacityCurrentValue -= city.getDemand();
 		this.visitedCities[city.getId() - 1] = true;		
 	}
 
 	public void resetPath() {
-		this.path = new ArrayList<City>();
-		this.path.add(homeCity);
+		this.path = new Path(homeCity);
 		this.capacityCurrentValue = this.capacityInitialValue;
 		this.tourLength = 0;
 		this.visitedCities = new boolean[this.dimension];
@@ -73,7 +67,7 @@ public abstract class Ant implements Comparable<Ant> {
 	}
 	
 	public boolean pathContains(City city){
-		for (City temp : this.path) {
+		for (City temp : this.path.getCities()) {
 			if(temp.getId() == city.getId()){
 				return true;
 			}
@@ -81,7 +75,7 @@ public abstract class Ant implements Comparable<Ant> {
 		return false;
 	}
 
-	public ArrayList<City> getPath() {
+	public Path getPath() {
 		return path;
 	}
 
