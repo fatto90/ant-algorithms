@@ -18,7 +18,6 @@ public abstract class World {
 	private int capacity;
 	private int[] demands;
 	private long seed;
-	private double bestTourSize = 0;
 
 	private String name;
 	private String comment;
@@ -27,7 +26,7 @@ public abstract class World {
 
 	protected ArrayList<Ant> ants;
 	protected ArrayList<City> cities;
-	private Path bestTour;
+	protected Path bestPath;
 
 	protected Pheromone pheromone;
 	private Random random;
@@ -366,14 +365,6 @@ public abstract class World {
 		return this.cities.get(cityId - 1);
 	}
 
-	public double getBestTourSize() {
-		return bestTourSize;
-	}
-
-	public Path getBestTour() {
-		return bestTour;
-	}
-
 	public double pathLength(String route) {
 		double length = 0;
 		String[] teste = route.split(",");
@@ -391,7 +382,7 @@ public abstract class World {
 	}
 
 	public ArrayList<City> opt2() {
-		String bestTour = Arrays.toString(getBestTour().getCities().toArray());
+		String bestTour = Arrays.toString(this.bestPath.getCities().toArray());
 		bestTour = bestTour.substring(4, bestTour.length() - 4).replace(" ", "");/*
 		String slice1 = "";
 		String slice2 = "";
@@ -447,11 +438,8 @@ public abstract class World {
 			}
 
 		}
-		
-		
 
 		return null;
-
 	}
 	
 	public String invertRoute(String route){
@@ -466,13 +454,7 @@ public abstract class World {
 		return result.substring(0, result.length() - 1);
 	}
 
-
-	public void setBestTourSize(double bestTourSize) {
-		this.bestTourSize = bestTourSize;
+	public Path getBestPath() {
+		return bestPath;
 	}
-
-	public void setBestTour(Path bestTour) {
-		this.bestTour = bestTour;
-	}
-
 }

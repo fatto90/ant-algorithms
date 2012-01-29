@@ -5,22 +5,19 @@ import br.dcc.ufrj.antvrp.world.City;
 
 public abstract class Ant implements Comparable<Ant> {
 
-	private int id;
-	private City homeCity;
-	//private ArrayList<City> path;
-	private Path path; 
-	private boolean []visitedCities;
-	protected int capacityInitialValue = 0;
-	protected int capacityCurrentValue = 0;
-	private double tourLength = 0;
-	private int dimension = 0;
-
 	public abstract City chooseNextMove(City city, double sample);
-
 	public abstract double dropPheromone();
 
+	private int id;
+	private City homeCity;
+	private Path path; 
+	private int dimension = 0;
+	protected int capacityInitialValue = 0;
+	protected int capacityCurrentValue = 0;
+	private boolean []visitedCities;
+
 	public Ant(int id, City homeCity, int capacity, int dimension) {
-		path = new Path(homeCity);
+		this.path = new Path(homeCity);
 		this.id = id;
 		this.homeCity = homeCity;
 		this.capacityInitialValue = capacity;		
@@ -39,7 +36,6 @@ public abstract class Ant implements Comparable<Ant> {
 	}
 
 	public void walk(City city) {
-		this.tourLength += this.path.getCurrentCity().getDistance(city.getId()); 
 		this.path.add(city);		
 		this.capacityCurrentValue -= city.getDemand();
 		this.visitedCities[city.getId() - 1] = true;		
@@ -48,16 +44,15 @@ public abstract class Ant implements Comparable<Ant> {
 	public void resetPath() {
 		this.path = new Path(homeCity);
 		this.capacityCurrentValue = this.capacityInitialValue;
-		this.tourLength = 0;
 		this.visitedCities = new boolean[this.dimension];
 		this.visitedCities[this.homeCity.getId() - 1] = true;
 	}
 
 	public int compareTo(Ant ant) {
-		if (this.getTourLength() > ant.getTourLength()) {
+		if (this.path.getLength() > ant.path.getLength()) {
 			return 1;
 
-		} else if (this.getTourLength() == ant.getTourLength()) {
+		} else if (this.path.getLength() == ant.path.getLength()) {
 			return 0;
 
 		} else {
@@ -79,8 +74,8 @@ public abstract class Ant implements Comparable<Ant> {
 		return path;
 	}
 
-	public double getTourLength() {
-		return tourLength;
+	public double getsTourLength() {
+		return this.path.getLength();
 	}
 	
 	public boolean isCityVisited(City city){
