@@ -1,7 +1,5 @@
 package br.dcc.ufrj.asrankvrp.simulator;
 
-import java.util.Arrays;
-
 import br.dcc.ufrj.asrankvrp.world.ASrankWorld;
 
 public class Simulador {
@@ -14,7 +12,7 @@ public class Simulador {
 	public static final int RANK_SIZE = 20;
 
 	public static void main(String[] args) throws Exception {
-		System.out.println("Iniciando execução do aplicativo.... ");
+		System.out.println("Iniciando execução do aplicativo... ");
 		System.out.println("Quantidade de simulações: " + QTDE_SIMULACOES);
 		System.out.println("Quantidade de rodadas estáveis: " + RODADAS_ESTAVEIS);
 		System.out.println("Quantidade de formigas: " + ANT_AMOUNT);
@@ -33,21 +31,21 @@ public class Simulador {
 		long t2 = System.currentTimeMillis();
 		for (int i = 1, j = 0; j <= RODADAS_ESTAVEIS; i++, j++) {
 			
-			long t1 = System.currentTimeMillis();
+			//long t1 = System.currentTimeMillis();
 			world.run();
 
-			if (world.getBestTourSize() < bestSolution || bestSolution == 0) {
-				bestSolution = world.getBestTourSize();
+			if (world.getBestPath().getLength() < bestSolution || bestSolution == 0) {
+				bestSolution = world.getBestPath().getLength();
 				j = 1;
 			}
-			System.out.println("[" + i + ", " + j + "] - Tbs: " + world.getBestTourSize() + " Tempo: " + (System.currentTimeMillis() - t1) + " milisegundos");
-
+			//System.out.println("[" + i + ", " + j + "] - Tbs: " + world.getBestTourSize() + " Tempo: " + (System.currentTimeMillis() - t1) + " milisegundos");
 		}
 
 		System.out.println("\n*******************************************************************************************");
 		System.out.println("Seed: " + world.getSeed());
-		System.out.println("Melhor Tour: " + Arrays.toString(world.getBestTour().getCities().toArray()));
-		System.out.println("Tamanho Melhor Tour: " + world.getBestTourSize());
+		System.out.println(world.getBestPath().lengthSubpath(0, 51));		
+		System.out.println("Melhor Tour: " + world.getBestPath());
+		System.out.println("Tamanho Melhor Tour: " + world.getBestPath().getLength());
 		System.out.println("Tempo total da simulação: " + (System.currentTimeMillis() - t2) + " milisegundos");
 	}
 }

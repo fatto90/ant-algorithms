@@ -50,7 +50,7 @@ public class ASrankAnt extends Ant {
 
 	@Override
 	public double dropPheromone() {		
-		return 1 / this.getTourLength();
+		return 1 / this.getPath().getLength();
 	}
 
 }

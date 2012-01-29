@@ -56,9 +56,8 @@ public class ASrankWorld extends World {
 			
 			ant.walk(ant.getHomeCity());
 			
-			if (this.getBestTourSize() > ant.getTourLength() || this.getBestTourSize() == 0){
-				this.setBestTourSize(ant.getTourLength());
-				this.setBestTour(ant.getPath());
+			if (this.bestPath == null || this.bestPath.getLength() > ant.getPath().getLength()){
+				this.bestPath = ant.getPath();
 			}
 		}
 	}
@@ -77,9 +76,9 @@ public class ASrankWorld extends World {
 			}
 		}
 		
-		for(City j: this.getBestTour().getCities()){
+		for(City j: this.bestPath.getCities()){
 			if (lastPathCity != null){
-				this.addPheromone(lastPathCity, j, (double)w / (double) this.getBestTourSize());				
+				this.addPheromone(lastPathCity, j, (double)w / (double) this.bestPath.getLength());				
 			}
 			lastPathCity = j;
 		}
