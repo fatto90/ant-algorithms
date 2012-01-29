@@ -43,21 +43,23 @@ public class ASrankWorld extends World {
 		City nextCity = null;
 
 		for (Ant ant : ants) {
-			ant.resetPath();
+			ant.resetTour();
 			
 			do {
-				currCity = ant.getPath().getCurrentCity();				
+				currCity = ant.getTour().getCurrentCity();				
 				nextCity = ant.chooseNextMove(currCity, this.getSampleDouble());
 				if (nextCity != null){
 					nextCity = this.getCity(nextCity.getId());
-					ant.walk(nextCity);
+					double distance = nextCity.getNeighborById(currCity.getId()).getDistance();
+					ant.walk(nextCity, distance);
 				}
 			} while (nextCity != null);				
 			
-			ant.walk(ant.getHomeCity());
+			double distance = currCity.getNeighborById(ant.getHomeCity().getId()).getDistance();
+			ant.walk(ant.getHomeCity(), distance);
 			
-			if (this.bestPath == null || this.bestPath.getLength() > ant.getPath().getLength()){
-				this.bestPath = ant.getPath();
+			if (this.bestTour == null || this.bestTour.getDistance() > ant.getTour().getDistance()){
+				this.bestTour = ant.getTour();
 			}
 		}
 	}
@@ -76,9 +78,9 @@ public class ASrankWorld extends World {
 			}
 		}
 		
-		for(City j: this.bestPath.getCities()){
+		for(City j: this.bestTour.getCities()){
 			if (lastPathCity != null){
-				this.addPheromone(lastPathCity, j, (double)w / (double) this.bestPath.getLength());				
+				this.addPheromone(lastPathCity, j, (double)w / (double) this.bestTour.getDistance());				
 			}
 			lastPathCity = j;
 		}
@@ -88,7 +90,7 @@ public class ASrankWorld extends World {
 		for (int r = 1; r < w; r++) {
 			Ant ant = (Ant) rank[r - 1];
 			
-			for (City pathCity : ant.getPath().getCities()) {				
+			for (City pathCity : ant.getTour().getCities()) {				
 				if (lastPathCity != null){
 					pheromone = ant.dropPheromone() * (w - r);
 					this.addPheromone(lastPathCity, pathCity, pheromone);
@@ -100,7 +102,7 @@ public class ASrankWorld extends World {
 	}
 
 	@Override
-	public double getInitialPathSize() {
+	public double getInitialTourSize() {
 		int dimension = this.getDimension();
 		double pathSize = 0;
 		ArrayList<Integer> initialTour = new ArrayList<Integer>();

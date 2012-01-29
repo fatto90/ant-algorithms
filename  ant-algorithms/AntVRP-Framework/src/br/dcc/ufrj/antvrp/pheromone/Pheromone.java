@@ -22,7 +22,7 @@ public class Pheromone {
 		}
 	}
 	
-	public double[] getNeighbourPheromone(City city){
+	public double[] getNeighborPheromone(City city){
 		int i = this.cities.indexOf(city);
 		return this.values[i];
 	}

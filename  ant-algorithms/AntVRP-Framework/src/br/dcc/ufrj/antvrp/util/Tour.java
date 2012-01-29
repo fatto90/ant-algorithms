@@ -5,27 +5,27 @@ import java.util.Arrays;
 
 import br.dcc.ufrj.antvrp.world.City;
 
-public class Path {
+public class Tour {
 	
 	private ArrayList<City> cities = null;
-	private ArrayList<Path> routes = null;
+	private ArrayList<Tour> routes = null;
 	private City startCity = null;
-	private double length = 0;
+	private double distance = 0;
 	
-	public Path(City startCity) {
+	public Tour(City startCity) {
 		this.cities = new ArrayList<City>();
-		this.routes = new ArrayList<Path>();
+		this.routes = new ArrayList<Tour>();
 		this.cities.add(startCity);		
 		this.startCity = startCity;
 
-		this.routes.add(new Path());
+		this.routes.add(new Tour());
 		this.routes.get(0).cities.add(startCity);
 		this.routes.get(0).setStartCity(startCity);
 	}
 	
-	public Path(){
+	public Tour(){
 		this.cities = new ArrayList<City>();
-		this.routes = new ArrayList<Path>();
+		this.routes = new ArrayList<Tour>();
 	}
 	
 	public ArrayList<City> getCities(){
@@ -35,23 +35,21 @@ public class Path {
 	public void reset(){
 		this.cities = new ArrayList<City>();
 		this.cities.add(this.startCity);
-		this.length = 0;
+		this.distance = 0;
 		
-		this.routes.add(new Path());
+		this.routes.add(new Tour());
 		this.routes.get(0).cities.add(startCity);
 		this.routes.get(0).setStartCity(startCity);
 	}
 	
 	public void add(City city){		
-		City lastCity = this.cities.get(this.cities.size() - 1);
-		this.length += Util.hypot(lastCity, city);
 		this.cities.add(city);
 		
-		if (startCity.getId() == city.getId()){
-			this.routes.add(new Path());
-		}
+		//if (startCity.getId() == city.getId()){
+			//this.routes.add(new Path());
+		//}
 		
-		this.routes.get(this.routes.size() - 1).cities.add(city);
+		//this.routes.get(this.routes.size() - 1).cities.add(city);
 			
 	}
 	
@@ -63,8 +61,8 @@ public class Path {
 		return this.cities.get(cityIndex);
 	}
 	
-	public Path subpath(int beginIndex, int endIndex){
-		Path result = new Path(this.startCity);
+	public Tour subTour(int beginIndex, int endIndex){
+		Tour result = new Tour(this.startCity);
 		
 		for(int i = beginIndex; i <= endIndex; i++){
 			result.add(this.cities.get(i));
@@ -73,8 +71,8 @@ public class Path {
 		return result;
 	}
 	
-	public Path subpathInvert(int beginIndex, int endIndex){
-		Path result = new Path(this.startCity);
+	public Tour subTourInvert(int beginIndex, int endIndex){
+		Tour result = new Tour(this.startCity);
 		
 		for(int i = endIndex; i >= beginIndex; i++){
 			result.add(this.cities.get(i));
@@ -83,7 +81,7 @@ public class Path {
 		return result;
 	}
 	
-	public double lengthSubpath(int beginIndex, int endIndex){
+	public double lengthSubTour(int beginIndex, int endIndex){
 		double result = 0;
 		City a = this.cities.get(beginIndex);
 		City b = null;
@@ -102,8 +100,8 @@ public class Path {
 		return Arrays.toString(this.cities.toArray());
 	}
 
-	public double getLength() {
-		return length;
+	public double getDistance() {
+		return distance;
 	}
 	
 	public int getRoutesLength(){
@@ -116,5 +114,25 @@ public class Path {
 
 	public void setStartCity(City startCity) {
 		this.startCity = startCity;
+	}
+
+	public void addDistance(double distance) {
+		this.distance += distance;		
+	}
+	
+	public double checkDistance(){
+		
+		City a = null;
+		double distance = 0;
+		
+		for (City b: this.cities){
+			if (a != null){
+				distance += Util.hypot(a, b);
+			}
+			a = b;
+		}
+		
+		return distance;
+		
 	}
 }

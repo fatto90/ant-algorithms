@@ -37,10 +37,10 @@ public class ASrankAnt extends Ant {
 			}
 			
 			if (acumulator > sample){
-				if (this.capacityCurrentValue - neighbor.getDemand() >= 0){
+				if (this.currentCapacity - neighbor.getDemand() >= 0){
 					return neighbor;
 				} else {
-					capacityCurrentValue = this.capacityInitialValue;
+					currentCapacity = this.totalCapacity;
 					return this.getHomeCity();
 				}
 			}
@@ -50,7 +50,7 @@ public class ASrankAnt extends Ant {
 
 	@Override
 	public double dropPheromone() {		
-		return 1 / this.getPath().getLength();
+		return 1 / this.getTour().getDistance();
 	}
 
 }

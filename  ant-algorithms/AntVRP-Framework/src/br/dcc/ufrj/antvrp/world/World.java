@@ -9,7 +9,7 @@ import java.util.Random;
 import br.dcc.ufrj.antvrp.ant.Ant;
 import br.dcc.ufrj.antvrp.exception.IllegalArgumentWorldException;
 import br.dcc.ufrj.antvrp.pheromone.Pheromone;
-import br.dcc.ufrj.antvrp.util.Path;
+import br.dcc.ufrj.antvrp.util.Tour;
 import br.dcc.ufrj.antvrp.util.Util;
 
 public abstract class World {
@@ -26,7 +26,7 @@ public abstract class World {
 
 	protected ArrayList<Ant> ants;
 	protected ArrayList<City> cities;
-	protected Path bestPath;
+	protected Tour bestTour;
 
 	protected Pheromone pheromone;
 	private Random random;
@@ -48,7 +48,7 @@ public abstract class World {
 
 	protected abstract void pheromoneUpdate();
 
-	protected abstract double getInitialPathSize();
+	protected abstract double getInitialTourSize();
 
 	protected abstract void computeHeuristics();
 
@@ -365,7 +365,7 @@ public abstract class World {
 		return this.cities.get(cityId - 1);
 	}
 
-	public double pathLength(String route) {
+	public double tourLength(String route) {
 		double length = 0;
 		String[] teste = route.split(",");
 		City c1 = null;
@@ -382,7 +382,7 @@ public abstract class World {
 	}
 
 	public ArrayList<City> opt2() {
-		String bestTour = Arrays.toString(this.bestPath.getCities().toArray());
+		String bestTour = Arrays.toString(this.bestTour.getCities().toArray());
 		bestTour = bestTour.substring(4, bestTour.length() - 4).replace(" ", "");/*
 		String slice1 = "";
 		String slice2 = "";
@@ -454,7 +454,7 @@ public abstract class World {
 		return result.substring(0, result.length() - 1);
 	}
 
-	public Path getBestPath() {
-		return bestPath;
+	public Tour getBestTour() {
+		return bestTour;
 	}
 }
