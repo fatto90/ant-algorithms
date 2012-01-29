@@ -44,13 +44,6 @@ public class Tour {
 	
 	public void add(City city){		
 		this.cities.add(city);
-		
-		//if (startCity.getId() == city.getId()){
-			//this.routes.add(new Path());
-		//}
-		
-		//this.routes.get(this.routes.size() - 1).cities.add(city);
-			
 	}
 	
 	public City getCurrentCity(){
