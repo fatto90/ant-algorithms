@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import br.dcc.ufrj.antvrp.util.Util;
 
-public class City implements Cloneable{
+public class Customer implements Cloneable{
 	
 	private int lat;
 	private int lon;
@@ -20,23 +20,26 @@ public class City implements Cloneable{
 	private double alphaPheromone;
 	private double atractivity;
 	
+	private Customer[] listCandidatesVector;
+	private Customer[] neighborsVector;
+	
 	
 	private boolean depot;
 	
-	private ArrayList<City> neighbors;
-	private ArrayList<City> neighborsOrderedById;
+	private ArrayList<Customer> listCandidates;
+	private ArrayList<Customer> neighbors;
 	
-	public City(int id, int lat, int lon) {
+	public Customer(int id, int lat, int lon) {
 		this.id = id;
 		this.lat = lat;
 		this.lon = lon;
-		this.neighbors = new ArrayList<City>();
-		this.neighborsOrderedById = new ArrayList<City>();
+		this.listCandidates = new ArrayList<Customer>();
+		this.neighbors = new ArrayList<Customer>();
 	}
 	
 	@Override
-	protected City clone() throws CloneNotSupportedException {
-		City city = new City(this.id, this.lat, this.lon);
+	protected Customer clone() throws CloneNotSupportedException {
+		Customer city = new Customer(this.id, this.lat, this.lon);
 		city.distance = this.distance;
 		city.heuristic = this.heuristic;
 		city.pheromone = this.pheromone;
@@ -45,42 +48,43 @@ public class City implements Cloneable{
 		city.demand = this.demand;
 		city.depot = this.depot;
 		city.atractivity = this.atractivity;
+		city.listCandidatesVector = listCandidatesVector;
+		city.neighborsVector = neighborsVector;
 		return city;
 	}
 	
-	public void addNeigbour(City newNeighbor) {
-		City neighbor = null;
+	public void addNeigbour(Customer newNeighbor) {
+		Customer neighbor = null;
 		double distance = 0;
 		
 		
 		try{
 			if (newNeighbor.getId() == this.id){
-				City nextNeighbor = newNeighbor.clone();
+				Customer nextNeighbor = newNeighbor.clone();
 				nextNeighbor.setDistance(0);
-				neighborsOrderedById.add(nextNeighbor);
+				neighbors.add(nextNeighbor);
 				return;
 			}
 			
 			distance = Util.hypot(this, newNeighbor);
-			City nextNeighbor = newNeighbor.clone();
+			Customer nextNeighbor = newNeighbor.clone();
 			
-			for (int i = 0; i < neighbors.size(); i++) {
-				neighbor = neighbors.get(i);
+			for (int i = 0; i < listCandidates.size(); i++) {
+				neighbor = listCandidates.get(i);
 				
 				if (distance < neighbor.getDistance()){
 					nextNeighbor.setDistance(distance);
-					neighbors.add(i, nextNeighbor);
-					neighborsOrderedById.add(nextNeighbor);
+					listCandidates.add(i, nextNeighbor);
+					neighbors.add(nextNeighbor);
 					return;
 				}
 			}
 			
 			if (neighbor == null || distance >= neighbor.getDistance()){
 				nextNeighbor.setDistance(distance);
+				listCandidates.add(nextNeighbor);
 				neighbors.add(nextNeighbor);
-				neighborsOrderedById.add(nextNeighbor);
 			}
-			
 			
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
@@ -98,11 +102,21 @@ public class City implements Cloneable{
 		return distance;
 	}
 
-	public double getDistance(int idCity) {
-		if (this.id == idCity){
+	public double getDistance(int idCustomer) {
+		if (this.id == idCustomer){
 			return 0;
 		} else {
-			return this.neighborsOrderedById.get(idCity - 1).getDistance();
+			//return this.neighbors.get(idCustomer - 1).getDistance();
+			return this.neighborsVector[idCustomer - 1].getDistance();
+		}
+	}
+	
+	public double getDistance(Customer neighbor) {
+		if (this.id == neighbor.getId()){
+			return 0;
+		} else {
+			//return this.neighbors.get(neighbor.getId() - 1).getDistance();
+			return this.neighborsVector[neighbor.getId() - 1].getDistance();
 		}
 	}
 
@@ -122,8 +136,8 @@ public class City implements Cloneable{
 		return id;
 	}
 
-	public ArrayList<City> getNeighbors() {
-		return neighbors;
+	public ArrayList<Customer> getListCandidates() {
+		return listCandidates;
 	}
 
 	public double getPheromone() {
@@ -190,15 +204,33 @@ public class City implements Cloneable{
 		this.atractivity = alphaPheromone * betaHeuristic;
 	}
 
-	public ArrayList<City> getNeighborsOrderedById() {
-		return neighborsOrderedById;
-	}
-	
-	public City getNeighborById(int cityId) {
-		return this.getNeighborsOrderedById().get(cityId - 1);
+	public Customer getNeighbor(int cityId) {
+		return this.neighborsVector[cityId - 1];//this.getNeighbors().get(cityId - 1);
 	}
 
 	public double getAtractivity() {
 		return atractivity;
 	}
+	
+	public void createVectors(){
+		listCandidatesVector = new Customer[listCandidates.size()];
+		neighborsVector = new Customer[neighbors.size()];
+		
+		for(int i = 0, j = 0; i < neighborsVector.length; i++, j++){
+			
+			if (i < listCandidatesVector.length){
+				listCandidatesVector[i] = listCandidates.get(i);
+			}
+			neighborsVector[j] = neighbors.get(j);
+		}
+	}
+	
+	public Customer getCandidate(int index){
+		return this.listCandidatesVector[index];
+	}
+	
+	public int getListCandidateSize(){
+		return this.listCandidatesVector.length;
+	}
+	
 }

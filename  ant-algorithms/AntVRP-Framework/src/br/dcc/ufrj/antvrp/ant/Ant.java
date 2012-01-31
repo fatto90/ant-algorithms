@@ -1,41 +1,41 @@
 package br.dcc.ufrj.antvrp.ant;
 
 import br.dcc.ufrj.antvrp.util.Tour;
-import br.dcc.ufrj.antvrp.world.City;
+import br.dcc.ufrj.antvrp.world.Customer;
 
 public abstract class Ant implements Comparable<Ant> {
 
-	public abstract City chooseNextMove(City city, double sample);
+	public abstract Customer chooseNextMove(Customer city, double sample);
 	public abstract double dropPheromone();
 
 	private int id;
-	private City homeCity;
+	private Customer firstCustomer;
 	private Tour tour; 
 	private int dimension = 0;
 	protected int totalCapacity = 0;
 	protected int currentCapacity = 0;
 	private boolean []visitedCities;
 
-	public Ant(int id, City homeCity, int capacity, int dimension) {
-		this.tour = new Tour(homeCity);
+	public Ant(int id, Customer firstCustomer, int capacity, int dimension) {
+		this.tour = new Tour(firstCustomer);
 		this.id = id;
-		this.homeCity = homeCity;
+		this.firstCustomer = firstCustomer;
 		this.totalCapacity = capacity;		
 		this.currentCapacity = capacity;
 		this.dimension = dimension;
 		this.visitedCities = new boolean[dimension];
-		this.visitedCities[homeCity.getId() - 1] = true;
+		this.visitedCities[firstCustomer.getId() - 1] = true;
 	}
 
 	public int getId() {
 		return id;
 	}
 
-	public City getHomeCity() {
-		return homeCity;
+	public Customer getFirstCustomer() {
+		return firstCustomer;
 	}
 
-	public void walk(City city, double distance) {
+	public void walk(Customer city, double distance) {
 		this.tour.add(city);
 		this.tour.addDistance(distance);
 		this.currentCapacity -= city.getDemand();
@@ -46,7 +46,7 @@ public abstract class Ant implements Comparable<Ant> {
 		this.tour.reset();
 		this.currentCapacity = this.totalCapacity;
 		this.visitedCities = new boolean[this.dimension];
-		this.visitedCities[this.homeCity.getId() - 1] = true;
+		this.visitedCities[this.firstCustomer.getId() - 1] = true;
 	}
 
 	public int compareTo(Ant ant) {
@@ -62,8 +62,8 @@ public abstract class Ant implements Comparable<Ant> {
 		}
 	}
 	
-	public boolean tourContains(City city){
-		for (City temp : this.tour.getCities()) {
+	public boolean tourContains(Customer city){
+		for (Customer temp : this.tour.getCustomers()) {
 			if(temp.getId() == city.getId()){
 				return true;
 			}
@@ -79,7 +79,7 @@ public abstract class Ant implements Comparable<Ant> {
 		return this.tour.getDistance();
 	}
 	
-	public boolean isCityVisited(City city){
+	public boolean isCustomerVisited(Customer city){
 		return this.visitedCities[city.getId() - 1];
 	}
 }

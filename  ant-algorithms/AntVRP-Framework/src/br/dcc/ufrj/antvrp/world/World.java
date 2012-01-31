@@ -3,7 +3,6 @@ package br.dcc.ufrj.antvrp.world;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Random;
 
 import br.dcc.ufrj.antvrp.ant.Ant;
@@ -25,8 +24,8 @@ public abstract class World {
 	private String edgeWeightType;
 
 	protected ArrayList<Ant> ants;
-	protected ArrayList<City> cities;
-	protected Tour bestTour;
+	protected ArrayList<Customer> cities;
+	private Tour bestTour;
 
 	protected Pheromone pheromone;
 	private Random random;
@@ -83,11 +82,11 @@ public abstract class World {
 		this.computeHeuristics();
 	}
 
-	protected void addPheromone(City a, City b, double pheromone) {
-		City na = a.getNeighborById(b.getId());
+	protected void addPheromone(Customer a, Customer b, double pheromone) {
+		Customer na = a.getNeighbor(b.getId());
 		na.setPheromone(pheromone + na.getPheromone());
 
-		City nb = b.getNeighborById(a.getId());
+		Customer nb = b.getNeighbor(a.getId());
 		nb.setPheromone(pheromone + nb.getPheromone());
 	}
 
@@ -97,18 +96,19 @@ public abstract class World {
 	}
 
 	public void createPheromones(double initialValue) {
-		for (City city : this.cities) {
-			for (City neighbor : city.getNeighbors()) {
+		for (Customer city : this.cities) {
+			for (Customer neighbor : city.getListCandidates()) {
 				neighbor.setPheromone(initialValue);
 			}
 		}
 	}
 
 	private void computeDistances() {
-		for (City city : this.cities) {
-			for (City neighbor : this.cities) {
-				city.addNeigbour(neighbor);
+		for (Customer city : this.cities) {
+			for (Customer neighbor : this.cities) {
+				city.addNeigbour(neighbor);				
 			}
+			city.createVectors();
 		}
 	}
 
@@ -197,23 +197,24 @@ public abstract class World {
 		}
 	}
 
-	private ArrayList<City> getCities(BufferedReader reader, int dimension) throws Exception {
-		ArrayList<City> cities = new ArrayList<City>();
+	private ArrayList<Customer> getCities(BufferedReader reader, int dimension) throws Exception {
+		ArrayList<Customer> cities = new ArrayList<Customer>();
 		int lat = 0;
 		int lon = 0;
 		int id = 0;
-		City city = null;
-
+		Customer city = null;
+		String[] values = null;
+		
 		for (int i = 0; i < dimension; i++) {
 
-			String[] values = reader.readLine().split(" ");
+			values = reader.readLine().split(" ");
 
 			if (values != null && values.length == 3) {
 
 				id = Integer.parseInt(Util.trim(values[0]));
 				lat = Integer.parseInt(Util.trim(values[1]));
 				lon = Integer.parseInt(Util.trim(values[2]));
-				city = new City(id, lat, lon);
+				city = new Customer(id, lat, lon);
 
 				cities.add(city);
 
@@ -234,12 +235,12 @@ public abstract class World {
 		}
 	}
 
-	private void getDemands(BufferedReader reader, ArrayList<City> cities) throws Exception {
+	private void getDemands(BufferedReader reader, ArrayList<Customer> cities) throws Exception {
 		String[] values = null;
 		int id = 0;
 		int demand = 0;
 
-		for (City city : cities) {
+		for (Customer city : cities) {
 			values = reader.readLine().split(" ");
 
 			if (values != null && values.length == 2) {
@@ -268,15 +269,15 @@ public abstract class World {
 	}
 
 	private void getDepots(BufferedReader reader) throws Exception {
-		String[] values = reader.readLine().split(" ");
+		String value = reader.readLine().replace(" ", "");
 		int id = 0;
 
-		for (int i = 0; !"-1".equals(Util.trim(values[1])); i++) {
+		for (int i = 0; !"-1".equals(value); i++) {
 
-			id = Integer.parseInt(Util.trim(values[1]));
+			id = Integer.parseInt(value);
 
-			if (values != null && values.length == 2) {
-				for (City city : this.cities) {
+			if (value != null && value.length() > 0) {
+				for (Customer city : this.cities) {
 					if (city.getId() == id) {
 						city.setDepot(true);
 						break;
@@ -286,7 +287,7 @@ public abstract class World {
 			} else {
 				throw new IllegalArgumentWorldException(TAG_DEPOT_SECTION);
 			}
-			values = reader.readLine().split(" ");
+			value =  reader.readLine().replace(" ", "");
 		}
 	}
 
@@ -322,7 +323,7 @@ public abstract class World {
 		return capacity;
 	}
 
-	public ArrayList<City> getCities() {
+	public ArrayList<Customer> getCities() {
 		return cities;
 	}
 
@@ -330,9 +331,9 @@ public abstract class World {
 		return demands;
 	}
 
-	public City getFirstDepot() {
+	public Customer getFirstDepot() {
 
-		for (City city : this.cities) {
+		for (Customer city : this.cities) {
 			if (city.isDepot()) {
 				return city;
 			}
@@ -361,19 +362,19 @@ public abstract class World {
 		return seed;
 	}
 
-	public City getCity(int cityId) {
+	public Customer getCustomer(int cityId) {
 		return this.cities.get(cityId - 1);
 	}
 
 	public double tourLength(String route) {
 		double length = 0;
-		String[] teste = route.split(",");
-		City c1 = null;
-		City c2 = null;
+		String[] teste = route.replace(" ", "").split(",");
+		Customer c1 = null;
+		Customer c2 = null;
 		
-		c1 = this.getCity(Integer.parseInt(teste[0]));
+		c1 = this.getCustomer(Integer.parseInt(teste[0]));
 		for (int i = 1; i < teste.length; i++) {
-			c2 = this.getCity(Integer.parseInt(teste[i]));
+			c2 = this.getCustomer(Integer.parseInt(teste[i]));
 			length += Util.hypot(c1, c2);
 			c1 = c2;
 		}
@@ -381,80 +382,13 @@ public abstract class World {
 		return length;
 	}
 
-	public ArrayList<City> opt2() {
-		String bestTour = Arrays.toString(this.bestTour.getCities().toArray());
-		bestTour = bestTour.substring(4, bestTour.length() - 4).replace(" ", "");/*
-		String slice1 = "";
-		String slice2 = "";
-		String slice3 = "";*/
-
-		double abDistance = 0;
-		double acDistance = 0;
-		double cdDistance = 0;
-		double bdDistance = 0;
-
-		City aCity = null;
-		City bCity = null;
-		City cCity = null;
-		City dCity = null;
-
-		String[] routes = bestTour.split(",1,");
-
-		for (int r = 0; r < routes.length; r++) {
-			String route = routes[r] + ",";
-
-			int t = route.indexOf(',', 0);
-			aCity = this.getCity(Integer.parseInt(route.substring(0, t)));
-
-			for (int i = t + 1, j = 0; i < route.length();) {
-				j = route.indexOf(',', i);
-				bCity = this.getCity(Integer.parseInt(route.substring(i, j)));
-				abDistance = Util.hypot(aCity, bCity);
-				t = route.indexOf(',', j + 1);
-				cCity = this.getCity(Integer.parseInt(route.substring(j + 1, t)));
-
-				for (int u = t + 1, v = 0; u < route.length();) {
-
-					v = route.indexOf(',', u);
-					dCity = this.getCity(Integer.parseInt(route.substring(u, v)));
-
-					acDistance = Util.hypot(aCity, cCity);
-					cdDistance = Util.hypot(cCity, dCity);
-					bdDistance = Util.hypot(bCity, dCity);
-
-					if (abDistance + cdDistance > acDistance + bdDistance) {
-						System.out.println("Slice1: " + route.substring(0, i));
-						System.out.println("Slice2: " + route.substring(i, u));
-						System.out.println("Slice3: " + route.substring(u, route.length()));
-					}
-
-					u = v + 1;
-					cCity = dCity;
-
-				}
-
-				aCity = bCity;
-				i = j + 1;
-			}
-
-		}
-
-		return null;
-	}
-	
-	public String invertRoute(String route){
-		
-		String[] cities = route.split(",");
-		String result = "";
-		
-		for(int i = cities.length - 1; i >= 0; i--){
-			result = result.concat(cities[i]).concat(",");
-		}
-		
-		return result.substring(0, result.length() - 1);
-	}
-
 	public Tour getBestTour() {
 		return bestTour;
 	}
+
+	public void setBestTour(Tour bestTour) {
+		this.bestTour = bestTour;
+	}
+	
+	
 }

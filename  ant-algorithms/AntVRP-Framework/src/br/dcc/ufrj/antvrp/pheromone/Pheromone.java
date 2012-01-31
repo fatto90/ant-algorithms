@@ -2,16 +2,16 @@ package br.dcc.ufrj.antvrp.pheromone;
 
 import java.util.ArrayList;
 
-import br.dcc.ufrj.antvrp.world.City;
+import br.dcc.ufrj.antvrp.world.Customer;
 
 
 public class Pheromone {
 	
 	private double [][]values;
 	private double evaporateTax = 0.1;
-	private ArrayList<City> cities;
+	private ArrayList<Customer> cities;
 	
-	public Pheromone(ArrayList<City> cities, double startValue){
+	public Pheromone(ArrayList<Customer> cities, double startValue){
 		this.cities = cities;
 		values = new double[cities.size()][cities.size()];
 		
@@ -22,7 +22,7 @@ public class Pheromone {
 		}
 	}
 	
-	public double[] getNeighborPheromone(City city){
+	public double[] getNeighborPheromone(Customer city){
 		int i = this.cities.indexOf(city);
 		return this.values[i];
 	}
