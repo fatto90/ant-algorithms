@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import br.dcc.ufrj.antvrp.ant.Ant;
-import br.dcc.ufrj.antvrp.world.City;
+import br.dcc.ufrj.antvrp.world.Customer;
 import br.dcc.ufrj.antvrp.world.World;
 import br.dcc.ufrj.asrankvrp.ant.ASrankAnt;
 
@@ -39,64 +39,69 @@ public class ASrankWorld extends World {
 
 	@Override
 	protected void tourConstruction() throws Exception{
-		City currCity = null;
-		City nextCity = null;
+		Customer currCustomer = null;
+		Customer nextCustomer = null;
+		double distance = 0;
 
 		for (Ant ant : ants) {
 			ant.resetTour();
 			
 			do {
-				currCity = ant.getTour().getCurrentCity();				
-				nextCity = ant.chooseNextMove(currCity, this.getSampleDouble());
-				if (nextCity != null){
-					nextCity = this.getCity(nextCity.getId());
-					double distance = nextCity.getNeighborById(currCity.getId()).getDistance();
-					ant.walk(nextCity, distance);
+				currCustomer = ant.getTour().getCurrentCustomer();				
+				nextCustomer = ant.chooseNextMove(currCustomer, this.getSampleDouble());
+				if (nextCustomer != null){
+					nextCustomer = this.getCustomer(nextCustomer.getId());
+					distance = nextCustomer.getNeighbor(currCustomer.getId()).getDistance();
+					ant.walk(nextCustomer, distance);
 				}
-			} while (nextCity != null);				
+			} while (nextCustomer != null);				
 			
-			double distance = currCity.getNeighborById(ant.getHomeCity().getId()).getDistance();
-			ant.walk(ant.getHomeCity(), distance);
+			distance = currCustomer.getNeighbor(ant.getFirstCustomer().getId()).getDistance();
+			ant.walk(ant.getFirstCustomer(), distance);
 			
-			if (this.bestTour == null || this.bestTour.getDistance() > ant.getTour().getDistance()){
-				this.bestTour = ant.getTour();
+			ant.getTour().opt2IntraRoutes();
+			if (this.getBestTour() == null || this.getBestTour().getDistance() > ant.getTour().getDistance()){
+				this.setBestTour(ant.getTour().clone());
 			}
 		}
 	}
 	
 	@Override
 	protected void pheromoneUpdate() {
-		City lastPathCity = null;
+		Ant ant = null;
+		Customer lastTourCustomer = null;
 		Object []rank = this.ants.toArray();
 		Arrays.sort(rank);
 		int w = rankSize;
 		double pheromone = 0;
 		
-		for (City i: this.cities){
-			for(City j: i.getNeighbors()){
+		for (Customer i: this.cities){
+			for(Customer j: i.getListCandidates()){
 				j.evapore(RO);
 			}
 		}
 		
-		for(City j: this.bestTour.getCities()){
-			if (lastPathCity != null){
-				this.addPheromone(lastPathCity, j, (double)w / (double) this.bestTour.getDistance());				
+		for(Customer j: this.getBestTour().getCustomers()){
+			if (lastTourCustomer != null){
+				if (lastTourCustomer.getId() != j.getId()){
+					this.addPheromone(lastTourCustomer, j, (double)w / (double) this.getBestTour().getDistance());				
+				}
 			}
-			lastPathCity = j;
+			lastTourCustomer = j;
 		}
 		
-		lastPathCity = null;		
+		lastTourCustomer = null;
  
 		for (int r = 1; r < w; r++) {
-			Ant ant = (Ant) rank[r - 1];
+			ant = (Ant) rank[r - 1];
 			
-			for (City pathCity : ant.getTour().getCities()) {				
-				if (lastPathCity != null){
+			for (Customer tourCustomer : ant.getTour().getCustomers()) {				
+				if (lastTourCustomer != null){
 					pheromone = ant.dropPheromone() * (w - r);
-					this.addPheromone(lastPathCity, pathCity, pheromone);
+					this.addPheromone(lastTourCustomer, tourCustomer, pheromone);
 				}
 				
-				lastPathCity = pathCity;
+				lastTourCustomer = tourCustomer;
 			}
 		}
 	}
@@ -106,18 +111,18 @@ public class ASrankWorld extends World {
 		int dimension = this.getDimension();
 		double pathSize = 0;
 		ArrayList<Integer> initialTour = new ArrayList<Integer>();
-		City nextCity = this.getFirstDepot();
-		initialTour.add(nextCity.getId());
+		Customer nextCustomer = this.getFirstDepot();
+		initialTour.add(nextCustomer.getId());
 
 		for (int i = 0; i < dimension; i++) {
-			for (City neighborCity : nextCity.getNeighbors()) {
-				if (!initialTour.contains(neighborCity.getId())) {
-					initialTour.add(neighborCity.getId());
-					pathSize += neighborCity.getDistance();
+			for (Customer neighborCustomer : nextCustomer.getListCandidates()) {
+				if (!initialTour.contains(neighborCustomer.getId())) {
+					initialTour.add(neighborCustomer.getId());
+					pathSize += neighborCustomer.getDistance();
 
-					for (City tempCity : this.getCities()) {
-						if (tempCity.getId() == neighborCity.getId()) {
-							nextCity = tempCity;
+					for (Customer tempCustomer : this.getCities()) {
+						if (tempCustomer.getId() == neighborCustomer.getId()) {
+							nextCustomer = tempCustomer;
 							break;
 						}
 					}
@@ -130,17 +135,18 @@ public class ASrankWorld extends World {
 	}
 
 	protected void computeHeuristics() {
-		City depot = null;
+		Customer depot = null;
 		double heuristic = 0;
 
-		for (City city : this.getCities()) {
+		for (Customer city : this.getCities()) {
 			if (city.isDepot()) {
 				depot = city;
+				break;
 			}
 		}
 
-		for (City city : this.cities) {
-			for (City neighbor : city.getNeighbors()) {
+		for (Customer city : this.cities) {
+			for (Customer neighbor : city.getListCandidates()) {
 				heuristic = depot.getDistance(city.getId()) + depot.getDistance(neighbor.getId()) - gParam * city.getDistance(neighbor.getId()) + fParam * Math.abs(depot.getDistance(city.getId()) - depot.getDistance(neighbor.getId()));
 				neighbor.setHeuristic(heuristic);
 			}
@@ -153,5 +159,18 @@ public class ASrankWorld extends World {
 
 	public void setRankSize(int rankSize) {
 		this.rankSize = rankSize;
+	}
+
+	public double getTourLength(String string) {
+		double result = 0;
+		String[] customers = string.replaceAll(" ", "").split(",");
+		
+		for(int i = 0; i < customers.length - 1; i++){
+			int a = Integer.parseInt(customers[i]);
+			int b = Integer.parseInt(customers[i + 1]);
+			result += this.cities.get(a - 1).getDistance(b);
+		}
+		
+		return result;
 	}
 }
