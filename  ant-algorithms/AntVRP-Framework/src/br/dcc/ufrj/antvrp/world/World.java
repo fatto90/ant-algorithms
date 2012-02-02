@@ -2,7 +2,6 @@ package br.dcc.ufrj.antvrp.world;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.ArrayList;
 import java.util.Random;
 
 import br.dcc.ufrj.antvrp.ant.Ant;
@@ -23,8 +22,8 @@ public abstract class World {
 	private String type;
 	private String edgeWeightType;
 
-	protected ArrayList<Ant> ants;
-	protected ArrayList<Customer> cities;
+	protected Ant[] ants;
+	protected Customer[] customers;
 	private Tour bestTour;
 
 	protected Pheromone pheromone;
@@ -71,9 +70,9 @@ public abstract class World {
 		this.edgeWeightType = this.getEdgeWeightType(reader);
 		this.capacity = this.getCapacity(reader);
 		this.passNodeCoordSection(reader);
-		this.cities = this.getCities(reader, this.dimension);
+		this.customers = this.getCustomers(reader, this.dimension);
 		this.passDemandSection(reader);
-		this.getDemands(reader, this.cities);
+		this.getDemands(reader, this.customers);
 		this.passDepotSection(reader);
 		getDepots(reader);
 		this.eof(reader);
@@ -96,7 +95,7 @@ public abstract class World {
 	}
 
 	public void createPheromones(double initialValue) {
-		for (Customer city : this.cities) {
+		for (Customer city : this.customers) {
 			for (Customer neighbor : city.getListCandidates()) {
 				neighbor.setPheromone(initialValue);
 			}
@@ -104,8 +103,8 @@ public abstract class World {
 	}
 
 	private void computeDistances() {
-		for (Customer city : this.cities) {
-			for (Customer neighbor : this.cities) {
+		for (Customer city : this.customers) {
+			for (Customer neighbor : this.customers) {
 				city.addNeigbour(neighbor);				
 			}
 			city.createVectors();
@@ -197,8 +196,8 @@ public abstract class World {
 		}
 	}
 
-	private ArrayList<Customer> getCities(BufferedReader reader, int dimension) throws Exception {
-		ArrayList<Customer> cities = new ArrayList<Customer>();
+	private Customer[] getCustomers(BufferedReader reader, int dimension) throws Exception {
+		Customer[] customers = new Customer[dimension];
 		int lat = 0;
 		int lon = 0;
 		int id = 0;
@@ -216,7 +215,7 @@ public abstract class World {
 				lon = Integer.parseInt(Util.trim(values[2]));
 				city = new Customer(id, lat, lon);
 
-				cities.add(city);
+				customers[i] = city;
 
 			} else {
 				throw new IllegalArgumentWorldException(TAG_NODE_COORD_SECTION);
@@ -224,7 +223,7 @@ public abstract class World {
 
 		}
 
-		return cities;
+		return customers;
 	}
 
 	private void passDemandSection(BufferedReader reader) throws Exception {
@@ -235,7 +234,7 @@ public abstract class World {
 		}
 	}
 
-	private void getDemands(BufferedReader reader, ArrayList<Customer> cities) throws Exception {
+	private void getDemands(BufferedReader reader, Customer[] cities) throws Exception {
 		String[] values = null;
 		int id = 0;
 		int demand = 0;
@@ -277,7 +276,7 @@ public abstract class World {
 			id = Integer.parseInt(value);
 
 			if (value != null && value.length() > 0) {
-				for (Customer city : this.cities) {
+				for (Customer city : this.customers) {
 					if (city.getId() == id) {
 						city.setDepot(true);
 						break;
@@ -323,8 +322,8 @@ public abstract class World {
 		return capacity;
 	}
 
-	public ArrayList<Customer> getCities() {
-		return cities;
+	public Customer[] getCities() {
+		return customers;
 	}
 
 	public int[] getDemands() {
@@ -333,7 +332,7 @@ public abstract class World {
 
 	public Customer getFirstDepot() {
 
-		for (Customer city : this.cities) {
+		for (Customer city : this.customers) {
 			if (city.isDepot()) {
 				return city;
 			}
@@ -363,7 +362,7 @@ public abstract class World {
 	}
 
 	public Customer getCustomer(int cityId) {
-		return this.cities.get(cityId - 1);
+		return this.customers[cityId - 1];
 	}
 
 	public double tourLength(String route) {
