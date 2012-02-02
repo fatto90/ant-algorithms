@@ -29,9 +29,9 @@ public class ASrankWorld extends World {
 
 	@Override
 	public void createAnts(int total) {
-		this.ants = new ArrayList<Ant>();
+		this.ants = new Ant[total];
 		for (int i = 0; i < total; i++) {
-			this.ants.add(new ASrankAnt(i, this.getFirstDepot(), this.getCapacity(), this.getDimension()));
+			this.ants[i] = new ASrankAnt(i, this.getFirstDepot(), this.getCapacity(), this.getDimension());
 		}
 		
 		this.rankSize = total / 5;
@@ -59,7 +59,7 @@ public class ASrankWorld extends World {
 			distance = currCustomer.getNeighbor(ant.getFirstCustomer().getId()).getDistance();
 			ant.walk(ant.getFirstCustomer(), distance);
 			
-			ant.getTour().opt2IntraRoutes();
+			//ant.getTour().opt2IntraRoutes();
 			if (this.getBestTour() == null || this.getBestTour().getDistance() > ant.getTour().getDistance()){
 				this.setBestTour(ant.getTour().clone());
 			}
@@ -70,12 +70,12 @@ public class ASrankWorld extends World {
 	protected void pheromoneUpdate() {
 		Ant ant = null;
 		Customer lastTourCustomer = null;
-		Object []rank = this.ants.toArray();
+		Ant []rank = this.ants;
 		Arrays.sort(rank);
 		int w = rankSize;
 		double pheromone = 0;
 		
-		for (Customer i: this.cities){
+		for (Customer i: this.customers){
 			for(Customer j: i.getListCandidates()){
 				j.evapore(RO);
 			}
@@ -145,7 +145,7 @@ public class ASrankWorld extends World {
 			}
 		}
 
-		for (Customer city : this.cities) {
+		for (Customer city : this.customers) {
 			for (Customer neighbor : city.getListCandidates()) {
 				heuristic = depot.getDistance(city.getId()) + depot.getDistance(neighbor.getId()) - gParam * city.getDistance(neighbor.getId()) + fParam * Math.abs(depot.getDistance(city.getId()) - depot.getDistance(neighbor.getId()));
 				neighbor.setHeuristic(heuristic);
@@ -168,7 +168,7 @@ public class ASrankWorld extends World {
 		for(int i = 0; i < customers.length - 1; i++){
 			int a = Integer.parseInt(customers[i]);
 			int b = Integer.parseInt(customers[i + 1]);
-			result += this.cities.get(a - 1).getDistance(b);
+			result += this.getCustomer(a).getDistance(b);
 		}
 		
 		return result;
