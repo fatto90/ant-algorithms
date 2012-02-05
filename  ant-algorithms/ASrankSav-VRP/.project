@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>ASrank-VRP</name>
+	<name>ASrankSav-VRP</name>
 	<comment></comment>
 	<projects>
 		<project>AntVRP</project>
