@@ -1,4 +1,4 @@
-package br.dcc.ufrj.asrankvrp.world;
+package br.dcc.ufrj.asranksavvrp.world;
 
 import java.util.Arrays;
 
@@ -6,9 +6,9 @@ import br.dcc.ufrj.antvrp.ant.Ant;
 import br.dcc.ufrj.antvrp.util.Tour;
 import br.dcc.ufrj.antvrp.world.Customer;
 import br.dcc.ufrj.antvrp.world.World;
-import br.dcc.ufrj.asrankvrp.ant.ASrankAnt;
+import br.dcc.ufrj.asranksavvrp.ant.ASrankSavAnt;
 
-public class ASrankWorld extends World {
+public class ASrankSavWorld extends World {
 
 	private int fParam = 2;
 	private int gParam = 2;
@@ -19,11 +19,11 @@ public class ASrankWorld extends World {
 		super.createWorld(path);
 	}
 
-	public ASrankWorld() {
+	public ASrankSavWorld() {
 		super();
 	}
 
-	public ASrankWorld(long seed) {
+	public ASrankSavWorld(long seed) {
 		super(seed);
 	}
 
@@ -31,7 +31,7 @@ public class ASrankWorld extends World {
 	public void createAnts(int total) {
 		this.ants = new Ant[total];
 		for (int i = 0; i < total; i++) {
-			this.ants[i] = new ASrankAnt(i, this.getFirstDepot(), this.getCapacity(), this.getDimension());
+			this.ants[i] = new ASrankSavAnt(i, this.getFirstDepot(), this.getCapacity(), this.getDimension());
 		}
 		
 		this.rankSize = total / 5;

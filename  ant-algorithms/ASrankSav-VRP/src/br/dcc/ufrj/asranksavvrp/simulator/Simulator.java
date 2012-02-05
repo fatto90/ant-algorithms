@@ -1,8 +1,8 @@
-package br.dcc.ufrj.asrankvrp.simulator;
+package br.dcc.ufrj.asranksavvrp.simulator;
 
 import br.dcc.ufrj.antvrp.util.Util;
 import br.dcc.ufrj.antvrp.world.World;
-import br.dcc.ufrj.asrankvrp.world.ASrankWorld;
+import br.dcc.ufrj.asranksavvrp.world.ASrankSavWorld;
 
 public class Simulator {
 
@@ -78,7 +78,7 @@ public class Simulator {
 		Simulator.getQuantidadeFormigas();
 		Simulator.getTamanhoRank();
 		
-		ASrankWorld world = new ASrankWorld();
+		ASrankSavWorld world = new ASrankSavWorld();
 		world.createWorld(fileName);
 		
 		Simulator.printInputs(world);		
@@ -105,7 +105,7 @@ public class Simulator {
 		}
 	}
 
-	private static void printIntance(ASrankWorld world) {
+	private static void printIntance(ASrankSavWorld world) {
 		System.out.println("Nome: " + world.getName());
 		System.out.println("Comentários: " + world.getComment());
 		System.out.println("Tipo: " + world.getType());

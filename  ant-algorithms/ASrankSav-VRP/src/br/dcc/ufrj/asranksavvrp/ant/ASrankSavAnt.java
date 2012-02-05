@@ -1,11 +1,11 @@
-package br.dcc.ufrj.asrankvrp.ant;
+package br.dcc.ufrj.asranksavvrp.ant;
 
 import br.dcc.ufrj.antvrp.ant.Ant;
 import br.dcc.ufrj.antvrp.world.Customer;
 
-public class ASrankAnt extends Ant {
+public class ASrankSavAnt extends Ant {
 
-	public ASrankAnt(int id, Customer firstCustomer, int capacity, int dimension) {
+	public ASrankSavAnt(int id, Customer firstCustomer, int capacity, int dimension) {
 		super(id, firstCustomer, capacity, dimension);
 	}
 
