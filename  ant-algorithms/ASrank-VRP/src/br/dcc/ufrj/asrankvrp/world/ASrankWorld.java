@@ -33,7 +33,7 @@ public class ASrankWorld extends World {
 		for (int i = 0; i < total; i++) {
 			this.ants[i] = new ASrankAnt(i, this.getFirstDepot(), this.getCapacity(), this.getDimension());
 		}
-		
+		this.setAntAmount(total);
 		this.rankSize = total / 5;
 	}
 

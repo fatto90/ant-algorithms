@@ -86,7 +86,7 @@ public class Simulator {
 		
 		world.createAnts(antAmount);
 		world.setRankSize(rankSize);
-		world.createPheromones(antAmount);
+		world.createPheromones();
 		
 		for(int s = 0; s < numeroSimulacoes; s++){
 			long t2 = System.currentTimeMillis();
