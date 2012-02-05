@@ -6,89 +6,106 @@ import java.util.Arrays;
 import br.dcc.ufrj.antvrp.world.Customer;
 
 public class Tour implements Cloneable {
-	
-	private ArrayList<Customer> customers = null;
+
+	private Customer[] customers = null;
 	private Customer firstCustomer = null;
 	private double distance = 0;
-	
-	public Tour(Customer firstCustomer) {
-		this.customers = new ArrayList<Customer>();
-		this.customers.add(firstCustomer);		
+	private int dimension = 0;
+	private int size = 0;
+	private boolean[] visited;
+
+	public Tour(Customer firstCustomer, int dimension) {
+		this.customers = new Customer[dimension * 2];
+		this.visited = new boolean[dimension];
+		this.customers[0] = firstCustomer;
+		this.visited[0] = true;
 		this.firstCustomer = firstCustomer;
+		this.dimension = dimension;
+		this.size = 1;
 	}
-	
-	public Tour(){
-		this.customers = new ArrayList<Customer>();
+
+	public Tour(int dimension) {
+		this.customers = new Customer[dimension * 2];
+		this.visited = new boolean[dimension];
+		this.dimension = dimension;
 	}
-	
-	public ArrayList<Customer> getCustomers(){
+
+	public Customer[] getCustomers() {
 		return this.customers;
 	}
-	
-	public void reset(){
-		this.customers = new ArrayList<Customer>();
-		this.customers.add(this.firstCustomer);
+
+	public void reset() {
+		this.visited = new boolean[dimension];
+		this.customers = new Customer[dimension * 2];
+		this.customers[firstCustomer.getId() - 1] = this.firstCustomer;
+		this.visited[firstCustomer.getId() - 1] = true;
 		this.distance = 0;
+		this.size = 1;
 	}
-	
-	public void add(Customer customer){		
-		this.customers.add(customer);
+
+	public void add(Customer customer) {
+		this.customers[this.size] = customer;
+		this.visited[customer.getId() - 1] = true;
+		this.distance += this.customers[this.size - 1].getDistance(customer);
+		this.size++;
 	}
-	
-	public Customer getCurrentCustomer(){
-		return this.customers.get(this.customers.size() - 1);
+
+	public Customer getCurrentCustomer() {
+		return this.customers[size - 1];
 	}
-	
-	public Customer getCustomer(int customerIndex){
-		return this.customers.get(customerIndex);
+
+	public Customer getCustomer(int customerIndex) {
+		return this.customers[customerIndex];
 	}
-	
-	public ArrayList<Tour> getRoutes(){
-		ArrayList<Tour> result = new ArrayList<Tour>();		
+
+	public ArrayList<Tour> getRoutes() {
+		ArrayList<Tour> result = new ArrayList<Tour>();
 		Tour tour = null;
 		Customer a = null;
-		
-		for (Customer b : this.customers){
-			if (a != null){
-				
-				if (a.getId() == this.firstCustomer.getId()){
-					tour = new Tour(a);
+
+		for (int i = 0; i < this.size; i++) {
+			Customer b = this.customers[i];
+
+			if (a != null) {
+
+				if (a.getId() == this.firstCustomer.getId()) {
+					tour = new Tour(a, this.dimension);
 					result.add(tour);
 				}
 
 				tour.add(b);
-				tour.addDistance(a.getDistance(b));
-				
+
 			}
 			a = b;
 		}
-		
+
 		return result;
 	}
-	
-	public double lengthSubTour(int beginIndex, int endIndex){
+
+	public double lengthSubTour(int beginIndex, int endIndex) {
 		double result = 0;
-		Customer a = this.customers.get(beginIndex);
+		Customer a = this.customers[beginIndex];
 		Customer b = null;
-		
-		for (int i = beginIndex + 1; i <= endIndex; i++){
-			b = this.customers.get(i);
+
+		for (int i = beginIndex + 1; i <= endIndex; i++) {
+			b = this.customers[i];
 			result += a.getDistance(b);
 			a = b;
 		}
-		
+
 		return result;
 	}
-	
+
 	@Override
 	public String toString() {
-		return Arrays.toString(this.customers.toArray());
+
+		return Arrays.toString(this.customers).replaceAll(", null", "");
 	}
 
 	public double getDistance() {
 		return distance;
 	}
-	
+
 	public Customer getFirstCustomer() {
 		return firstCustomer;
 	}
@@ -97,60 +114,57 @@ public class Tour implements Cloneable {
 		this.firstCustomer = firstCustomer;
 	}
 
-	public void addDistance(double distance) {
-		this.distance += distance;		
-	}
-	
-	public double recalcDistance(){
-		
+	public double recalcDistance() {
+
 		Customer a = null;
 		double distance = 0;
-		
-		for (Customer b: this.customers){
-			if (a != null){
+
+		for (int i = 0; i < this.size; i++) {
+			Customer b = this.customers[i];
+			if (a != null) {
 				distance += a.getDistance(b);
 			}
 			a = b;
 		}
-		
+
 		this.distance = distance;
 		return distance;
 	}
-	
+
 	public Tour opt2IntraRoutes() {
 		ArrayList<Tour> routes = this.getRoutes();
-		ArrayList<Customer> customers = null;
+		Customer[] customers = null;
 		Customer t = null;
 		int aIndex = 0;
 		int bIndex = 0;
 		int cIndex = 0;
 		int dIndex = 0;
-		
-		for(int r = 0; r < routes.size(); r++){
+
+		for (int r = 0; r < routes.size(); r++) {
 			Tour route = routes.get(r);
 			customers = route.getCustomers();
-			
-			for (int i = 0; i < route.getCustomers().size() - 3; ){
-				Customer a = customers.get(i);
+
+			for (int i = 0; i < route.getSize() - 3;) {
+				Customer a = customers[i];
 				aIndex = i;
-				Customer b = customers.get(++i);
+				Customer b = customers[++i];
 				bIndex = i;
 				double distanceAB = a.getDistance(b);
-				
-				for(int j = 1; j < route.getCustomers().size() - 1;){
-					if (j >= i - 2 && j <= i + 2){
+
+				for (int j = 1; j < route.getSize() - 1;) {
+					if (j >= i - 2 && j <= i + 2) {
 						break;
 					}
-					Customer c = customers.get(j);
+					Customer c = customers[j];
 					cIndex = j;
-					Customer d = customers.get(++j);				
+					Customer d = customers[++j];
 					dIndex = j;
 					double distanceCD = c.getDistance(d);
 					double distanceAC = a.getDistance(c);
 					double distanceBD = b.getDistance(d);
-					
-					if (distanceAB + distanceCD > distanceAC + distanceBD && d.getId() != firstCustomer.getId()){
-						if (i < j){
+
+					if (distanceAB + distanceCD > distanceAC + distanceBD && d.getId() != firstCustomer.getId()) {
+						if (i < j) {
 							route.changeOpt2(bIndex, cIndex);
 							t = b;
 							b = c;
@@ -173,132 +187,125 @@ public class Tour implements Cloneable {
 				}
 			}
 		}
-		
-		
-		
+
 		int i = 0;
 		Customer a = null;
-		for(Tour route : routes){
+		for (Tour route : routes) {
 
-			for (Customer b : route.getCustomers()){
-				if (a != null){
-					if (a.getId() != b.getId()){
-						this.customers.set(i, b);
+			for (int j = 0; j < route.getSize(); j++) {
+				Customer b = route.getCustomers()[j];
+				if (a != null) {
+					if (a.getId() != b.getId()) {
+						this.customers[i] = b;
 						i++;
 					}
-					
+
 				} else {
-					this.customers.set(i, b);
+					this.customers[i] = b;
 					i++;
-					
+
 				}
 				a = b;
 			}
 		}
-		
+
 		this.recalcDistance();
-		
+
 		return this;
 	}
 
-	public Tour opt2InterRoutes() {
+	public Tour interchange() {
 		ArrayList<Tour> routes = this.getRoutes();
-		ArrayList<Customer> customers = null;
-		Customer t = null;
-		int aIndex = 0;
-		int bIndex = 0;
-		int cIndex = 0;
-		int dIndex = 0;
-		
-		for(int r = 0; r < routes.size(); r++){
-			Tour route = routes.get(r);
-			customers = route.getCustomers();
-			
-			for (int i = 0; i < route.getCustomers().size() - 3; ){
-				Customer a = customers.get(i);
-				aIndex = i;
-				Customer b = customers.get(++i);
-				bIndex = i;
-				double distanceAB = a.getDistance(b);
-				
-				for(int j = 1; j < route.getCustomers().size() - 1;){
-					if (j >= i - 2 && j <= i + 2){
-						break;
-					}
-					Customer c = customers.get(j);
-					cIndex = j;
-					Customer d = customers.get(++j);				
-					dIndex = j;
-					double distanceCD = c.getDistance(d);
-					double distanceAC = a.getDistance(c);
-					double distanceBD = b.getDistance(d);
-					
-					if (distanceAB + distanceCD > distanceAC + distanceBD && d.getId() != firstCustomer.getId()){
-						if (i < j){
-							route.changeOpt2(bIndex, cIndex);
-							t = b;
-							b = c;
-							c = t;
-							t = null;
-						} else {
-							route.changeOpt2(dIndex, aIndex);
-							t = a;
-							a = d;
-							d = t;
-							t = null;
+		double distanceAfter = 0;
+		double distanceBefore = 0;
+
+		for (Tour route1 : routes) {
+			for (int i = 2; i < route1.getSize() - 2; i++) {
+				Customer a = route1.getCustomers()[i];
+
+				if (a == null || a.isDepot()) {
+					break;
+				}
+				Customer aLess = route1.getCustomers()[i - 1];
+				Customer aGreater = route1.getCustomers()[i + 1];
+
+				for (Tour route2 : routes) {
+					if (!route1.equals(route2)){
+						
+						for (int j = 2; i < route2.getSize() - 2; j++){
+							Customer b = route2.getCustomers()[j];
+
+							if (b == null || b.isDepot()) {
+								break;
+							}
+							Customer bLess = route2.getCustomers()[j - 1];
+							Customer bGreater = route2.getCustomers()[j + 1];
+							distanceBefore = a.getDistance(aLess) + a.getDistance(aGreater) + b.getDistance(bLess) + b.getDistance(bGreater);
+							distanceAfter = b.getDistance(aLess) + b.getDistance(aGreater) + a.getDistance(bLess) + a.getDistance(bGreater);
+							
+							if (distanceBefore > distanceAfter){
+								route1.getCustomers()[i] = b;
+								route2.getCustomers()[j] = a;
+								a = b;
+							}
+							
+							distanceBefore = 0;
+							distanceAfter = 0;
 						}
-						route = routes.get(r);
-						customers = route.getCustomers();
-						distanceAB = a.getNeighbor(b.getId()).getDistance();
-						distanceCD = c.getDistance(d);
-						distanceAC = a.getDistance(c);
-						distanceBD = b.getDistance(d);
 					}
 				}
 			}
 		}
-		
-		
-		
+
 		int i = 0;
 		Customer a = null;
-		for(Tour route : routes){
+		for (Tour route : routes) {
 
-			for (Customer b : route.getCustomers()){
-				if (a != null){
-					if (a.getId() != b.getId()){
-						this.customers.set(i, b);
+			for (int j = 0; j < route.getSize(); j++) {
+				Customer b = route.getCustomers()[j];
+				if (a != null) {
+					if (a.getId() != b.getId()) {
+						this.customers[i] = b;
 						i++;
 					}
-					
+
 				} else {
-					this.customers.set(i, b);
+					this.customers[i] = b;
 					i++;
-					
+
 				}
 				a = b;
 			}
 		}
-		
+
 		this.recalcDistance();
-		
+
 		return this;
 	}
 
-	
 	private void changeOpt2(int start, int end) {
-		ArrayList<Customer> customers = new ArrayList<Customer>(this.customers);
-		for(int i = start, j = end; i <= end; i++, j--){
-			this.customers.set(i, customers.get(j));
+		Customer[] customers = this.customers.clone();
+		for (int i = start, j = end; i <= end; i++, j--) {
+			this.customers[i] = customers[j];
 		}
 	}
-	
+
 	@Override
 	public Tour clone() {
-		Tour clone = new Tour();
+		Tour clone = new Tour(this.dimension);
 		clone.customers = this.customers;
 		clone.distance = this.distance;
 		clone.firstCustomer = this.firstCustomer;
+		clone.size = size;
+		clone.dimension = dimension;
 		return clone;
+	}
+
+	public int getSize() {
+		return size;
+	}
+
+	public boolean contains(Customer customer) {
+		return this.visited[customer.getId() - 1];
 	}
 }

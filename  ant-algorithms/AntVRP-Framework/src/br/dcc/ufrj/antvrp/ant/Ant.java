@@ -11,20 +11,15 @@ public abstract class Ant implements Comparable<Ant> {
 	private int id;
 	private Customer firstCustomer;
 	private Tour tour; 
-	private int dimension = 0;
 	protected int totalCapacity = 0;
 	protected int currentCapacity = 0;
-	private boolean []visitedCities;
 
 	public Ant(int id, Customer firstCustomer, int capacity, int dimension) {
-		this.tour = new Tour(firstCustomer);
+		this.tour = new Tour(firstCustomer, dimension);
 		this.id = id;
 		this.firstCustomer = firstCustomer;
 		this.totalCapacity = capacity;		
 		this.currentCapacity = capacity;
-		this.dimension = dimension;
-		this.visitedCities = new boolean[dimension];
-		this.visitedCities[firstCustomer.getId() - 1] = true;
 	}
 
 	public int getId() {
@@ -37,16 +32,12 @@ public abstract class Ant implements Comparable<Ant> {
 
 	public void walk(Customer city, double distance) {
 		this.tour.add(city);
-		this.tour.addDistance(distance);
 		this.currentCapacity -= city.getDemand();
-		this.visitedCities[city.getId() - 1] = true;		
 	}
 
 	public void resetTour() {
 		this.tour.reset();
 		this.currentCapacity = this.totalCapacity;
-		this.visitedCities = new boolean[this.dimension];
-		this.visitedCities[this.firstCustomer.getId() - 1] = true;
 	}
 
 	public int compareTo(Ant ant) {
@@ -77,9 +68,5 @@ public abstract class Ant implements Comparable<Ant> {
 
 	public double getsTourLength() {
 		return this.tour.getDistance();
-	}
-	
-	public boolean isCustomerVisited(Customer city){
-		return this.visitedCities[city.getId() - 1];
 	}
 }

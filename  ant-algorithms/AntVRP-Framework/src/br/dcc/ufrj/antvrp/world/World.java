@@ -2,6 +2,7 @@ package br.dcc.ufrj.antvrp.world;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.ArrayList;
 import java.util.Random;
 
 import br.dcc.ufrj.antvrp.ant.Ant;
@@ -16,6 +17,7 @@ public abstract class World {
 	private int capacity;
 	private int[] demands;
 	private long seed;
+	private double initialPheromoneValue = 1;
 
 	private String name;
 	private String comment;
@@ -24,6 +26,7 @@ public abstract class World {
 
 	protected Ant[] ants;
 	protected Customer[] customers;
+	protected Customer[] depots;
 	private Tour bestTour;
 
 	protected Pheromone pheromone;
@@ -46,9 +49,11 @@ public abstract class World {
 
 	protected abstract void pheromoneUpdate();
 
-	protected abstract double getInitialTourSize();
+	protected abstract Tour getInitialTour();
 
 	protected abstract void computeHeuristics();
+	
+	protected abstract double getIntialValue(int antsAmount);
 
 	public World() {
 		this.seed = new Random().nextLong();
@@ -74,11 +79,20 @@ public abstract class World {
 		this.passDemandSection(reader);
 		this.getDemands(reader, this.customers);
 		this.passDepotSection(reader);
-		getDepots(reader);
+		this.getDepots(reader);
 		this.eof(reader);
 		reader.close();
 		this.computeDistances();
 		this.computeHeuristics();
+	}
+	
+	public void reset() {
+		this.bestTour = null;
+		for (Customer city : this.customers) {
+			for (Customer neighbor : city.getListCandidates()) {
+				neighbor.setPheromone(this.initialPheromoneValue);
+			}
+		}
 	}
 
 	protected void addPheromone(Customer a, Customer b, double pheromone) {
@@ -94,10 +108,11 @@ public abstract class World {
 		this.pheromoneUpdate();
 	}
 
-	public void createPheromones(double initialValue) {
+	public void createPheromones(int antsAmount) {
+		this.initialPheromoneValue = this.getIntialValue(antsAmount);
 		for (Customer city : this.customers) {
 			for (Customer neighbor : city.getListCandidates()) {
-				neighbor.setPheromone(initialValue);
+				neighbor.setPheromone(this.initialPheromoneValue);
 			}
 		}
 	}
@@ -268,6 +283,7 @@ public abstract class World {
 	}
 
 	private void getDepots(BufferedReader reader) throws Exception {
+		ArrayList<Customer> depots = new ArrayList<Customer>();
 		String value = reader.readLine().replace(" ", "");
 		int id = 0;
 
@@ -276,9 +292,10 @@ public abstract class World {
 			id = Integer.parseInt(value);
 
 			if (value != null && value.length() > 0) {
-				for (Customer city : this.customers) {
-					if (city.getId() == id) {
-						city.setDepot(true);
+				for (Customer customer : this.customers) {
+					if (customer.getId() == id) {
+						customer.setDepot(true);
+						depots.add(customer);
 						break;
 					}
 				}
@@ -287,6 +304,11 @@ public abstract class World {
 				throw new IllegalArgumentWorldException(TAG_DEPOT_SECTION);
 			}
 			value =  reader.readLine().replace(" ", "");
+		}
+		
+		this.depots = new Customer[depots.size()];
+		for (int i = 0; i < depots.size(); i++){
+			this.depots[i] = depots.get(i);
 		}
 	}
 
