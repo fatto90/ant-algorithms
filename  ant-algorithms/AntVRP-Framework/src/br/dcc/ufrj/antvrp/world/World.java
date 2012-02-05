@@ -16,6 +16,7 @@ public abstract class World {
 	private int dimension;
 	private int capacity;
 	private int[] demands;
+	private int antAmount;
 	private long seed;
 	private double initialPheromoneValue = 1;
 
@@ -28,6 +29,7 @@ public abstract class World {
 	protected Customer[] customers;
 	protected Customer[] depots;
 	private Tour bestTour;
+	
 
 	protected Pheromone pheromone;
 	private Random random;
@@ -108,8 +110,8 @@ public abstract class World {
 		this.pheromoneUpdate();
 	}
 
-	public void createPheromones(int antsAmount) {
-		this.initialPheromoneValue = this.getIntialValue(antsAmount);
+	public void createPheromones() {
+		this.initialPheromoneValue = this.getIntialValue(this.antAmount);
 		for (Customer city : this.customers) {
 			for (Customer neighbor : city.getListCandidates()) {
 				neighbor.setPheromone(this.initialPheromoneValue);
@@ -409,6 +411,14 @@ public abstract class World {
 
 	public void setBestTour(Tour bestTour) {
 		this.bestTour = bestTour;
+	}
+
+	public void setAntAmount(int antAmount) {
+		this.antAmount = antAmount;
+	}
+
+	public int getAntAmount() {
+		return antAmount;
 	}
 	
 	
