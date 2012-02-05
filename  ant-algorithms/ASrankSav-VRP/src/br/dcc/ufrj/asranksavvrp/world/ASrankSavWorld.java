@@ -10,10 +10,9 @@ import br.dcc.ufrj.asranksavvrp.ant.ASrankSavAnt;
 
 public class ASrankSavWorld extends World {
 
-	private int fParam = 2;
-	private int gParam = 2;
 	private static double RO = 0.1; 
 	private int rankSize;
+	
 
 	public void createWorld(String path) throws Exception {
 		super.createWorld(path);
@@ -33,7 +32,7 @@ public class ASrankSavWorld extends World {
 		for (int i = 0; i < total; i++) {
 			this.ants[i] = new ASrankSavAnt(i, this.getFirstDepot(), this.getCapacity(), this.getDimension());
 		}
-		
+		this.setAntAmount(total);
 		this.rankSize = total / 5;
 	}
 
@@ -144,10 +143,17 @@ public class ASrankSavWorld extends World {
 			}
 		}
 
-		for (Customer city : this.customers) {
-			for (Customer neighbor : city.getListCandidates()) {
-				heuristic = depot.getDistance(city.getId()) + depot.getDistance(neighbor.getId()) - gParam * city.getDistance(neighbor.getId()) + fParam * Math.abs(depot.getDistance(city.getId()) - depot.getDistance(neighbor.getId()));
-				neighbor.setHeuristic(heuristic);
+		for (Customer i : this.customers) {
+			for (Customer j : i.getListCandidates()) {
+				if (i.getId() == depot.getId()){
+					heuristic = depot.getDistance(j);
+				} else {
+					heuristic = depot.getDistance(i) + depot.getDistance(j) - i.getDistance(j);
+					if (heuristic < 0){
+						System.out.println(heuristic);
+					}
+				}
+				j.setHeuristic(heuristic);
 			}
 		}
 	}
