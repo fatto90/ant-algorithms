@@ -220,37 +220,39 @@ public class Tour implements Cloneable {
 		double distanceBefore = 0;
 
 		for (Tour route1 : routes) {
-			for (int i = 2; i < route1.getSize() - 2; i++) {
-				Customer a = route1.getCustomers()[i];
+			for (int i = 3; i < route1.getSize(); i++) {
+				Customer aLess = route1.getCustomers()[i - 3];
+				Customer a = route1.getCustomers()[i - 2];
+				Customer b = route1.getCustomers()[i - 1];
+				Customer bGreater = route1.getCustomers()[i];
 
 				if (a == null || a.isDepot()) {
 					break;
 				}
-				Customer aLess = route1.getCustomers()[i - 1];
-				Customer aGreater = route1.getCustomers()[i + 1];
 
 				for (Tour route2 : routes) {
 					if (!route1.equals(route2)){
 						
-						for (int j = 2; i < route2.getSize() - 2; j++){
-							Customer b = route2.getCustomers()[j];
+						for (int j = 3; j < route2.getSize(); j++){
+							Customer cLess = route2.getCustomers()[j - 3];
+							Customer c = route2.getCustomers()[j - 2];
+							Customer d = route2.getCustomers()[j - 1];
+							Customer dGreater = route2.getCustomers()[j];
 
-							if (b == null || b.isDepot()) {
+							if (c == null || c.isDepot()) {
 								break;
 							}
-							Customer bLess = route2.getCustomers()[j - 1];
-							Customer bGreater = route2.getCustomers()[j + 1];
-							distanceBefore = a.getDistance(aLess) + a.getDistance(aGreater) + b.getDistance(bLess) + b.getDistance(bGreater);
-							distanceAfter = b.getDistance(aLess) + b.getDistance(aGreater) + a.getDistance(bLess) + a.getDistance(bGreater);
+							distanceBefore = aLess.getDistance(a) + b.getDistance(bGreater) + cLess.getDistance(c) + d.getDistance(dGreater);
+							distanceAfter =  aLess.getDistance(c) + d.getDistance(bGreater) + cLess.getDistance(a) + b.getDistance(dGreater);
 							
 							if (distanceBefore > distanceAfter){
-								route1.getCustomers()[i] = b;
-								route2.getCustomers()[j] = a;
-								a = b;
+								route2.getCustomers()[j - 2] = a;
+								route2.getCustomers()[j - 1] = b;
+								route1.getCustomers()[i - 2] = c;
+								route1.getCustomers()[i - 1] = d;
+								a = c;
+								b = d;
 							}
-							
-							distanceBefore = 0;
-							distanceAfter = 0;
 						}
 					}
 				}

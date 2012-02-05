@@ -55,7 +55,7 @@ public class AsRankSavSimulator extends Simulator{
 			simulator.setTamanhoRank();
 		}
 		
-		ASrankSavWorld world = new ASrankSavWorld();
+		ASrankSavWorld world = new ASrankSavWorld(0);
 		world.createWorld(simulator.getFileName());
 		
 		simulator.printInputs(world);		
@@ -73,6 +73,7 @@ public class AsRankSavSimulator extends Simulator{
 				world.run();
 				if (world.getBestTour().getDistance() < bestSolution || bestSolution == 0) {
 					bestSolution = world.getBestTour().getDistance();
+					System.out.println(bestSolution);
 					j = 0;
 				}
 			}

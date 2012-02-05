@@ -57,8 +57,9 @@ public class ASrankSavWorld extends World {
 			
 			distance = currCustomer.getNeighbor(ant.getFirstCustomer().getId()).getDistance();
 			ant.walk(ant.getFirstCustomer(), distance);
-
+			
 			ant.getTour().opt2IntraRoutes();
+			
 			if (this.getBestTour() == null || this.getBestTour().getDistance() > ant.getTour().getDistance()){
 				this.setBestTour(ant.getTour().clone());
 			}

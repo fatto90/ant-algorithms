@@ -106,7 +106,6 @@ public class Customer implements Cloneable{
 		if (this.id == idCustomer){
 			return 0;
 		} else {
-			//return this.neighbors.get(idCustomer - 1).getDistance();
 			return this.neighborsVector[idCustomer - 1].getDistance();
 		}
 	}
