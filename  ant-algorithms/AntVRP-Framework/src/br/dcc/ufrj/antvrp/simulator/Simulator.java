@@ -4,7 +4,7 @@ import br.dcc.ufrj.antvrp.util.Util;
 
 public abstract class Simulator {
 	
-	private String fileName;
+	private String fileName = "C:\\Users\\Fabio\\Desktop\\dataset\\att48.vrp";
 	private final int RODADAS_ESTAVEIS = 100;
 	private int numeroSimulacoes = 100;
 	private int antAmount = 1000;
@@ -17,7 +17,6 @@ public abstract class Simulator {
 			this.fileName = fileName; 
 		} else{
 			this.isDefaultMode = true;
-			this.fileName = "C:\\Users\\Fabio\\Desktop\\dataset\\att48.vrp";
 		}
 	}
 	

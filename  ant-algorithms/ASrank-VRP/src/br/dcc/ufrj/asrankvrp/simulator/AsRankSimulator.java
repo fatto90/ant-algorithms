@@ -23,6 +23,7 @@ public class AsRankSimulator extends Simulator{
 		System.out.println("Numero de Veículos: " + world.getBestTour().getRoutes().size());
 		System.out.println("Tamanho Melhor Tour: " + world.getBestTour().getDistance());
 		System.out.println("Tempo total da simulação: " + tempo + " milissegundos\n");
+		System.out.println(world.getBestTour().getDistance());
 	}
 	
 	private void printInputs(World world)  throws Exception{
@@ -40,7 +41,7 @@ public class AsRankSimulator extends Simulator{
 		System.out.println("Tipo: " + world.getType());
 		System.out.println("Dimensão: " + world.getDimension());
 		System.out.println("Edge Weight Type: " + world.getEdgeWeightType());
-		System.out.println("Capacidade: " + world.getCapacity());
+		System.out.println("Capacidade: " + world.getCapacity() + "\n");
 		
 	}	
 
@@ -48,8 +49,8 @@ public class AsRankSimulator extends Simulator{
 		AsRankSimulator simulator = new AsRankSimulator();
 		simulator.printHeader();
 		
-		simulator.setFileName();
-		if (!simulator.isDefaultMode()){
+		//simulator.setFileName();
+		if (simulator.isDefaultMode()){
 			simulator.setNumeroSimulacoes();
 			simulator.setQuantidadeFormigas();
 			simulator.setTamanhoRank();
