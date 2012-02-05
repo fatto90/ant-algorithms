@@ -1,9 +1,9 @@
 package br.dcc.ufrj.asrankvrp.world;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import br.dcc.ufrj.antvrp.ant.Ant;
+import br.dcc.ufrj.antvrp.util.Tour;
 import br.dcc.ufrj.antvrp.world.Customer;
 import br.dcc.ufrj.antvrp.world.World;
 import br.dcc.ufrj.asrankvrp.ant.ASrankAnt;
@@ -58,8 +58,8 @@ public class ASrankWorld extends World {
 			
 			distance = currCustomer.getNeighbor(ant.getFirstCustomer().getId()).getDistance();
 			ant.walk(ant.getFirstCustomer(), distance);
-			
-			//ant.getTour().opt2IntraRoutes();
+
+			ant.getTour().opt2IntraRoutes();
 			if (this.getBestTour() == null || this.getBestTour().getDistance() > ant.getTour().getDistance()){
 				this.setBestTour(ant.getTour().clone());
 			}
@@ -71,7 +71,7 @@ public class ASrankWorld extends World {
 		Ant ant = null;
 		Customer lastTourCustomer = null;
 		Ant []rank = this.ants;
-		Arrays.sort(rank);
+		Arrays.sort(rank);		
 		int w = rankSize;
 		double pheromone = 0;
 		
@@ -81,13 +81,14 @@ public class ASrankWorld extends World {
 			}
 		}
 		
-		for(Customer j: this.getBestTour().getCustomers()){
+		for(int i = 0; i < this.getBestTour().getSize(); i++){
+			Customer customer = this.getBestTour().getCustomers()[i];
 			if (lastTourCustomer != null){
-				if (lastTourCustomer.getId() != j.getId()){
-					this.addPheromone(lastTourCustomer, j, (double)w / (double) this.getBestTour().getDistance());				
+				if (lastTourCustomer.getId() != customer.getId()){
+					this.addPheromone(lastTourCustomer, customer, (double)w / (double) this.getBestTour().getDistance());				
 				}
 			}
-			lastTourCustomer = j;
+			lastTourCustomer = customer;
 		}
 		
 		lastTourCustomer = null;
@@ -95,7 +96,8 @@ public class ASrankWorld extends World {
 		for (int r = 1; r < w; r++) {
 			ant = (Ant) rank[r - 1];
 			
-			for (Customer tourCustomer : ant.getTour().getCustomers()) {				
+			for (int i = 0; i < ant.getTour().getSize(); i++) {
+				Customer tourCustomer = ant.getTour().getCustomers()[i];
 				if (lastTourCustomer != null){
 					pheromone = ant.dropPheromone() * (w - r);
 					this.addPheromone(lastTourCustomer, tourCustomer, pheromone);
@@ -107,31 +109,28 @@ public class ASrankWorld extends World {
 	}
 
 	@Override
-	public double getInitialTourSize() {
+	public Tour getInitialTour() {
 		int dimension = this.getDimension();
-		double pathSize = 0;
-		ArrayList<Integer> initialTour = new ArrayList<Integer>();
-		Customer nextCustomer = this.getFirstDepot();
-		initialTour.add(nextCustomer.getId());
-
-		for (int i = 0; i < dimension; i++) {
-			for (Customer neighborCustomer : nextCustomer.getListCandidates()) {
-				if (!initialTour.contains(neighborCustomer.getId())) {
-					initialTour.add(neighborCustomer.getId());
-					pathSize += neighborCustomer.getDistance();
-
-					for (Customer tempCustomer : this.getCities()) {
-						if (tempCustomer.getId() == neighborCustomer.getId()) {
-							nextCustomer = tempCustomer;
-							break;
-						}
-					}
-					break;
-				}
+		Customer depot = this.depots[0];
+		Customer customer = this.depots[0];
+		Tour tour = new Tour(customer, dimension);
+		int currentCapacity = 0;
+		for(Customer candidate : customer.getListCandidates()){
+			if(currentCapacity >= this.getCapacity()){
+				tour.add(depot);
+				currentCapacity = 0;
+				customer = depot;
+			} 
+			if (!tour.contains(candidate)){
+				candidate = this.getCustomer(candidate.getId());
+				tour.add(candidate);
+				customer = candidate;
+				currentCapacity++;
 			}
 		}
-
-		return pathSize;
+		
+		tour.add(depot);
+		return tour;
 	}
 
 	protected void computeHeuristics() {
@@ -172,5 +171,10 @@ public class ASrankWorld extends World {
 		}
 		
 		return result;
+	}
+
+	@Override
+	protected double getIntialValue(int antsAmount) {
+		return antsAmount / this.getInitialTour().getDistance();
 	}
 }

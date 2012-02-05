@@ -19,7 +19,7 @@ public class ASrankAnt extends Ant {
 
 		for (int i = 0, j = 0; j < size && i < customer.getListCandidateSize(); i++) {
 			candidate = customer.getCandidate(i);
-			if (!this.isCustomerVisited(candidate)) {
+			if (!this.getTour().contains(candidate)) {
 				sum += candidate.getAtractivity();
 				j++;
 			}
@@ -29,7 +29,7 @@ public class ASrankAnt extends Ant {
 		for (int i = 0; i < iterations; i++) {
 			candidate = customer.getCandidate(i);
 
-			if (!this.isCustomerVisited(candidate)) {
+			if (!this.getTour().contains(candidate)) {
 				acumulator += candidate.getAtractivity() / sum ;
 
 				if (acumulator > sample) {
