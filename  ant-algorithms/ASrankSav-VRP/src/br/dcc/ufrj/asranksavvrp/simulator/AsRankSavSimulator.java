@@ -13,7 +13,7 @@ public class AsRankSavSimulator extends Simulator{
 		System.out.println("Projeto Final de Curso");
 		System.out.println("Aluno: Fabio Augusto Antunes Barbosa DRE:102025586");
 		System.out.println("Orientador: João Carlos Pereira da Silva");		
-		System.out.println("Implementação do Algoritmo ASrank para o Problema de Roteamento de Veículos.");
+		System.out.println("Implementação do Algoritmo ASrankSav para o Problema de Roteamento de Veículos.");
 		System.out.println("============================================================================\n\n");
 	}
 	
@@ -22,8 +22,8 @@ public class AsRankSavSimulator extends Simulator{
 		System.out.println("Melhor Tour: " + world.getBestTour());
 		System.out.println("Numero de Veículos: " + world.getBestTour().getRoutes().size());
 		System.out.println("Tamanho Melhor Tour: " + world.getBestTour().getDistance());
+		System.out.println("  Tamanho Pior Tour: " + world.getWorstTour().getDistance());
 		System.out.println("Tempo total da simulação: " + tempo + " milissegundos\n");
-		System.out.println(world.getBestTour().getDistance());
 	}
 	
 	private void printInputs(World world)  throws Exception{
@@ -49,8 +49,8 @@ public class AsRankSavSimulator extends Simulator{
 		AsRankSavSimulator simulator = new AsRankSavSimulator();
 		simulator.printHeader();
 		
-		//simulator.setFileName();
-		if (simulator.isDefaultMode()){
+		simulator.setFileName();
+		if (!simulator.isDefaultMode()){
 			simulator.setNumeroSimulacoes();
 			simulator.setQuantidadeFormigas();
 			simulator.setTamanhoRank();

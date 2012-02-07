@@ -57,6 +57,10 @@ public class ASrankSavWorld extends World {
 			
 			distance = currCustomer.getNeighbor(ant.getFirstCustomer().getId()).getDistance();
 			ant.walk(ant.getFirstCustomer(), distance);
+
+			if (this.getWorstTour() == null || this.getWorstTour().getDistance() < ant.getTour().getDistance()){
+				this.setWorstTour(ant.getTour().clone());
+			}
 			
 			ant.getTour().opt2IntraRoutes();
 			
@@ -113,23 +117,33 @@ public class ASrankSavWorld extends World {
 		int dimension = this.getDimension();
 		Customer depot = this.depots[0];
 		Customer customer = this.depots[0];
+		Customer candidate = null;
 		Tour tour = new Tour(customer, dimension);
 		int currentCapacity = 0;
-		for(Customer candidate : customer.getListCandidates()){
+		int i = 0;
+		
+		do {
+			candidate = customer.getListCandidates().get(i);			
+			candidate = this.getCustomer(candidate.getId());
+			
 			if(currentCapacity >= this.getCapacity()){
 				tour.add(depot);
 				currentCapacity = 0;
 				customer = depot;
 			} 
 			if (!tour.contains(candidate)){
-				candidate = this.getCustomer(candidate.getId());
 				tour.add(candidate);
 				customer = candidate;
 				currentCapacity++;
+				i = 0;
+			} else {
+				i++;
 			}
-		}
+			
+		} while (i < customer.getListCandidates().size());
 		
 		tour.add(depot);
+		tour.recalcDistance();
 		return tour;
 	}
 
