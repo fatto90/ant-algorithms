@@ -57,7 +57,6 @@ public class Customer implements Cloneable{
 		Customer neighbor = null;
 		double distance = 0;
 		
-		
 		try{
 			if (newNeighbor.getId() == this.id){
 				Customer nextNeighbor = newNeighbor.clone();
@@ -68,22 +67,24 @@ public class Customer implements Cloneable{
 			
 			distance = Util.hypot(this, newNeighbor);
 			Customer nextNeighbor = newNeighbor.clone();
+			nextNeighbor.setDistance(distance);
+			neighbors.add(nextNeighbor);
+			
+			if (nextNeighbor.isDepot()){
+				return;
+			}
 			
 			for (int i = 0; i < listCandidates.size(); i++) {
 				neighbor = listCandidates.get(i);
 				
 				if (distance < neighbor.getDistance()){
-					nextNeighbor.setDistance(distance);
 					listCandidates.add(i, nextNeighbor);
-					neighbors.add(nextNeighbor);
 					return;
 				}
 			}
 			
 			if (neighbor == null || distance >= neighbor.getDistance()){
-				nextNeighbor.setDistance(distance);
 				listCandidates.add(nextNeighbor);
-				neighbors.add(nextNeighbor);
 			}
 			
 		} catch (Exception e) {

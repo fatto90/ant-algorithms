@@ -29,6 +29,7 @@ public abstract class World {
 	protected Customer[] customers;
 	protected Customer[] depots;
 	private Tour bestTour;
+	private Tour worstTour;
 	
 
 	protected Pheromone pheromone;
@@ -389,22 +390,6 @@ public abstract class World {
 		return this.customers[cityId - 1];
 	}
 
-	public double tourLength(String route) {
-		double length = 0;
-		String[] teste = route.replace(" ", "").split(",");
-		Customer c1 = null;
-		Customer c2 = null;
-		
-		c1 = this.getCustomer(Integer.parseInt(teste[0]));
-		for (int i = 1; i < teste.length; i++) {
-			c2 = this.getCustomer(Integer.parseInt(teste[i]));
-			length += Util.hypot(c1, c2);
-			c1 = c2;
-		}
-		
-		return length;
-	}
-
 	public Tour getBestTour() {
 		return bestTour;
 	}
@@ -419,6 +404,14 @@ public abstract class World {
 
 	public int getAntAmount() {
 		return antAmount;
+	}
+
+	public Tour getWorstTour() {
+		return worstTour;
+	}
+
+	public void setWorstTour(Tour worstTour) {
+		this.worstTour = worstTour;
 	}
 	
 	
