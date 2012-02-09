@@ -12,7 +12,6 @@ public class ASrankSavWorld extends World {
 
 	private static double RO = 0.1; 
 	private int rankSize;
-	
 
 	public void createWorld(String path) throws Exception {
 		super.createWorld(path);
