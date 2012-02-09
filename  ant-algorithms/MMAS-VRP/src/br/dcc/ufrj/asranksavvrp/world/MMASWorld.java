@@ -1,28 +1,29 @@
 package br.dcc.ufrj.asranksavvrp.world;
 
-import java.util.Arrays;
-
 import br.dcc.ufrj.antvrp.ant.Ant;
 import br.dcc.ufrj.antvrp.util.Tour;
 import br.dcc.ufrj.antvrp.world.Customer;
 import br.dcc.ufrj.antvrp.world.World;
-import br.dcc.ufrj.asranksavvrp.ant.ASrankSavAnt;
+import br.dcc.ufrj.asranksavvrp.ant.MMASAnt;
 
-public class ASrankSavWorld extends World {
+public class MMASWorld extends World {
 
 	private static double RO = 0.1; 
-	private int rankSize;
+	private double maxLimit = 0;
+	private double minLimit = 0;
+	private Tour iterationBest = null;
+	private boolean bestTourUpdateEnabled = false;
 	
 
 	public void createWorld(String path) throws Exception {
 		super.createWorld(path);
 	}
 
-	public ASrankSavWorld() {
+	public MMASWorld() {
 		super();
 	}
 
-	public ASrankSavWorld(long seed) {
+	public MMASWorld(long seed) {
 		super(seed);
 	}
 
@@ -30,10 +31,9 @@ public class ASrankSavWorld extends World {
 	public void createAnts(int total) {
 		this.ants = new Ant[total];
 		for (int i = 0; i < total; i++) {
-			this.ants[i] = new ASrankSavAnt(i, this.getFirstDepot(), this.getCapacity(), this.getDimension());
+			this.ants[i] = new MMASAnt(i, this.getFirstDepot(), this.getCapacity(), this.getDimension());
 		}
 		this.setAntAmount(total);
-		this.rankSize = total / 5;
 	}
 
 	@Override
@@ -41,6 +41,7 @@ public class ASrankSavWorld extends World {
 		Customer currCustomer = null;
 		Customer nextCustomer = null;
 		double distance = 0;
+		this.iterationBest = null;
 
 		for (Ant ant : ants) {
 			ant.resetTour();
@@ -66,50 +67,54 @@ public class ASrankSavWorld extends World {
 			
 			if (this.getBestTour() == null || this.getBestTour().getDistance() > ant.getTour().getDistance()){
 				this.setBestTour(ant.getTour().clone());
+				this.maxLimit = 1 / (RO * this.getBestTour().getDistance());
+				this.minLimit = this.maxLimit / 2;
 			}
+			
+			if (this.iterationBest == null || this.iterationBest.getDistance() > ant.getTour().getDistance()){
+				this.setIterationBest(ant.getTour());
+			}
+
 		}
 	}
 	
 	@Override
 	protected void pheromoneUpdate() {
-		Ant ant = null;
-		Customer lastTourCustomer = null;
-		Ant []rank = this.ants;
-		Arrays.sort(rank);		
-		int w = rankSize;
 		double pheromone = 0;
 		
 		for (Customer i: this.customers){
 			for(Customer j: i.getListCandidates()){
-				j.evapore(RO);
+				pheromone = Math.max(j.getPheromone() * (1 - RO), minLimit);
+				j.setPheromone(pheromone);
 			}
 		}
 		
-		for(int i = 0; i < this.getBestTour().getSize(); i++){
-			Customer customer = this.getBestTour().getCustomers()[i];
-			if (lastTourCustomer != null){
-				if (lastTourCustomer.getId() != customer.getId()){
-					this.addPheromone(lastTourCustomer, customer, (double)w / (double) this.getBestTour().getDistance());				
+		if (isBestTourEnabled()){
+			this.pheromoneUpdateTour(this.getBestTour());
+		} else {
+			this.pheromoneUpdateTour(this.getIterationBest());
+		}
+	}
+	
+	private void pheromoneUpdateTour(Tour tour){
+		Customer a = null;
+		for(Customer b: tour.getCustomers()){
+			if (a != null){
+				if (a.getId() != b.getId()){
+					this.addPheromone(a, b, 1 / tour.getDistance());				
 				}
 			}
-			lastTourCustomer = customer;
+			a = b;
 		}
-		
-		lastTourCustomer = null;
- 
-		for (int r = 1; r < w; r++) {
-			ant = (Ant) rank[r - 1];
-			
-			for (int i = 0; i < ant.getTour().getSize(); i++) {
-				Customer tourCustomer = ant.getTour().getCustomers()[i];
-				if (lastTourCustomer != null){
-					pheromone = ant.dropPheromone() * (w - r);
-					this.addPheromone(lastTourCustomer, tourCustomer, pheromone);
-				}
-				
-				lastTourCustomer = tourCustomer;
-			}
-		}
+	}
+	
+	@Override
+	protected void addPheromone(Customer a, Customer b, double pheromone) {
+		Customer na = a.getNeighbor(b.getId());		
+		na.setPheromone(Math.min(pheromone + na.getPheromone(), this.maxLimit));
+
+		Customer nb = b.getNeighbor(a.getId());
+		nb.setPheromone(Math.min(pheromone + nb.getPheromone(), this.maxLimit));
 	}
 
 	@Override
@@ -173,14 +178,6 @@ public class ASrankSavWorld extends World {
 		}
 	}
 
-	public int getRankSize() {
-		return rankSize;
-	}
-
-	public void setRankSize(int rankSize) {
-		this.rankSize = rankSize;
-	}
-
 	public double getTourLength(String string) {
 		double result = 0;
 		String[] customers = string.replaceAll(" ", "").split(",");
@@ -196,6 +193,24 @@ public class ASrankSavWorld extends World {
 
 	@Override
 	protected double getIntialValue(int antsAmount) {
-		return antsAmount / this.getInitialTour().getDistance();
+		this.maxLimit = 1 / (RO * this.getInitialTour().getDistance());
+		this.minLimit = this.maxLimit / 2;
+		return this.maxLimit;
+	}
+
+	public boolean isBestTourEnabled() {
+		return bestTourUpdateEnabled;
+	}
+
+	public void setBestTourEnabled(boolean bestTourEnabled) {
+		this.bestTourUpdateEnabled = bestTourEnabled;
+	}
+
+	public Tour getIterationBest() {
+		return iterationBest;
+	}
+
+	public void setIterationBest(Tour iterationBest) {
+		this.iterationBest = iterationBest;
 	}
 }

@@ -2,9 +2,9 @@ package br.dcc.ufrj.asranksavvrp.simulator;
 
 import br.dcc.ufrj.antvrp.simulator.Simulator;
 import br.dcc.ufrj.antvrp.world.World;
-import br.dcc.ufrj.asranksavvrp.world.ASrankSavWorld;
+import br.dcc.ufrj.asranksavvrp.world.MMASWorld;
 
-public class AsRankSavSimulator extends Simulator{
+public class MMASSimulator extends Simulator{
 	
 	private void printHeader(){
 		System.out.println("============================================================================");
@@ -35,7 +35,7 @@ public class AsRankSavSimulator extends Simulator{
 		System.out.println("Seed: " + world.getSeed() + "\n");
 	}
 	
-	private void printIntance(ASrankSavWorld world) {
+	private void printIntance(MMASWorld world) {
 		System.out.println("Nome: " + world.getName());
 		System.out.println("Comentários: " + world.getComment());
 		System.out.println("Tipo: " + world.getType());
@@ -46,7 +46,7 @@ public class AsRankSavSimulator extends Simulator{
 	}	
 
 	public static void main(String[] args) throws Exception {
-		AsRankSavSimulator simulator = new AsRankSavSimulator();
+		MMASSimulator simulator = new MMASSimulator();
 		simulator.printHeader();
 		
 		simulator.setFileName();
@@ -56,14 +56,13 @@ public class AsRankSavSimulator extends Simulator{
 			simulator.setTamanhoRank();
 		}
 		
-		ASrankSavWorld world = new ASrankSavWorld();
+		MMASWorld world = new MMASWorld();
 		world.createWorld(simulator.getFileName());
 		
 		simulator.printInputs(world);		
 		simulator.printIntance(world);
 		
 		world.createAnts(simulator.getAntAmount());
-		world.setRankSize(simulator.getRankSize());
 		world.createPheromones();
 		
 		for(int s = 0; s < simulator.getNumeroSimulacoes(); s++){

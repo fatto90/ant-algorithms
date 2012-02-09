@@ -3,9 +3,9 @@ package br.dcc.ufrj.asranksavvrp.ant;
 import br.dcc.ufrj.antvrp.ant.Ant;
 import br.dcc.ufrj.antvrp.world.Customer;
 
-public class ASrankSavAnt extends Ant {
+public class MMASAnt extends Ant {
 
-	public ASrankSavAnt(int id, Customer firstCustomer, int capacity, int dimension) {
+	public MMASAnt(int id, Customer firstCustomer, int capacity, int dimension) {
 		super(id, firstCustomer, capacity, dimension);
 	}
 
