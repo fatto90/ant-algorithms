@@ -31,7 +31,6 @@ public class MMASSimulator extends Simulator{
 		System.out.println("Quantidade de simulações: " + this.getNumeroSimulacoes());
 		System.out.println("Quantidade de rodadas estáveis: " + this.getRodadasEstaveis());
 		System.out.println("Quantidade de formigas: " + this.getAntAmount());
-		System.out.println("Rank size: " + this.getRankSize());
 		System.out.println("Seed: " + world.getSeed() + "\n");
 	}
 	
@@ -53,7 +52,6 @@ public class MMASSimulator extends Simulator{
 		if (!simulator.isDefaultMode()){
 			simulator.setNumeroSimulacoes();
 			simulator.setQuantidadeFormigas();
-			simulator.setTamanhoRank();
 		}
 		
 		MMASWorld world = new MMASWorld();
