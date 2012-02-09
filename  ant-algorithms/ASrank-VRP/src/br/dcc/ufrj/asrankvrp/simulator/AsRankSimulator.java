@@ -1,10 +1,13 @@
 package br.dcc.ufrj.asrankvrp.simulator;
 
 import br.dcc.ufrj.antvrp.simulator.Simulator;
+import br.dcc.ufrj.antvrp.util.Util;
 import br.dcc.ufrj.antvrp.world.World;
 import br.dcc.ufrj.asrankvrp.world.ASrankWorld;
 
 public class AsRankSimulator extends Simulator{
+	
+	private int rankSize = 20;
 	
 	private void printHeader(){
 		System.out.println("============================================================================");
@@ -43,7 +46,16 @@ public class AsRankSimulator extends Simulator{
 		System.out.println("Edge Weight Type: " + world.getEdgeWeightType());
 		System.out.println("Capacidade: " + world.getCapacity() + "\n");
 		
-	}	
+	}
+	
+	protected void setTamanhoRank() throws Exception{
+		int rankSize = Util.getIntegerStdin("Informe o tamanho do ranking de formigas: ");
+		this.rankSize = rankSize; 
+	}
+
+	public int getRankSize() {
+		return rankSize;
+	}
 
 	public static void main(String[] args) throws Exception {
 		AsRankSimulator simulator = new AsRankSimulator();
