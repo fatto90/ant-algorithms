@@ -8,7 +8,6 @@ public abstract class Simulator {
 	private final int RODADAS_ESTAVEIS = 100;
 	private int numeroSimulacoes = 100;
 	private int antAmount = 1000;
-	private int rankSize = 20;
 	private boolean isDefaultMode = false;
 	
 	protected void setFileName() throws Exception{
@@ -30,17 +29,8 @@ public abstract class Simulator {
 		this.antAmount = antAmount ; 
 	}
 	
-	protected void setTamanhoRank() throws Exception{
-		int rankSize = Util.getIntegerStdin("Informe o tamanho do ranking de formigas: ");
-		this.rankSize = rankSize; 
-	}
-
 	public int getAntAmount() {
 		return antAmount;
-	}
-
-	public int getRankSize() {
-		return rankSize;
 	}
 
 	public int getRodadasEstaveis() {
