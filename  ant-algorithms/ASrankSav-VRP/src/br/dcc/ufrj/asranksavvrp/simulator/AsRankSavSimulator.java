@@ -1,10 +1,22 @@
 package br.dcc.ufrj.asranksavvrp.simulator;
 
 import br.dcc.ufrj.antvrp.simulator.Simulator;
+import br.dcc.ufrj.antvrp.util.Util;
 import br.dcc.ufrj.antvrp.world.World;
 import br.dcc.ufrj.asranksavvrp.world.ASrankSavWorld;
 
 public class AsRankSavSimulator extends Simulator{
+	
+	private int rankSize = 20;
+	
+	protected void setTamanhoRank() throws Exception{
+		int rankSize = Util.getIntegerStdin("Informe o tamanho do ranking de formigas: ");
+		this.rankSize = rankSize; 
+	}
+
+	public int getRankSize() {
+		return rankSize;
+	}
 	
 	private void printHeader(){
 		System.out.println("============================================================================");
@@ -49,14 +61,14 @@ public class AsRankSavSimulator extends Simulator{
 		AsRankSavSimulator simulator = new AsRankSavSimulator();
 		simulator.printHeader();
 		
-		simulator.setFileName();
-		if (!simulator.isDefaultMode()){
+		//simulator.setFileName();
+		if (simulator.isDefaultMode()){
 			simulator.setNumeroSimulacoes();
 			simulator.setQuantidadeFormigas();
 			simulator.setTamanhoRank();
 		}
 		
-		ASrankSavWorld world = new ASrankSavWorld();
+		ASrankSavWorld world = new ASrankSavWorld(0);
 		world.createWorld(simulator.getFileName());
 		
 		simulator.printInputs(world);		
