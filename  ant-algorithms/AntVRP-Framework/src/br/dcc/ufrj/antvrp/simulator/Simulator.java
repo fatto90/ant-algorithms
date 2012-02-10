@@ -4,11 +4,11 @@ import br.dcc.ufrj.antvrp.util.Util;
 
 public abstract class Simulator {
 	
-	private String fileName = "C:\\Users\\Fabio\\Desktop\\dataset\\att48.vrp";
-	private final int RODADAS_ESTAVEIS = 100;
-	private int numeroSimulacoes = 100;
-	private int antAmount = 1000;
-	private boolean isDefaultMode = false;
+	protected String fileName = "C:\\Users\\Fabio\\Desktop\\dataset\\att48.vrp";
+	protected final int RODADAS_ESTAVEIS = 100;
+	protected int numeroSimulacoes = 100;
+	protected int antAmount = 1000;
+	protected boolean isDefaultMode = false;
 	
 	protected void setFileName() throws Exception{
 		String fileName = Util.getStringStdin("Informe o dataset: ");
