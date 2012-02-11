@@ -41,7 +41,6 @@ public class ASrankWorld extends World {
 	protected void tourConstruction() throws Exception{
 		Customer currCustomer = null;
 		Customer nextCustomer = null;
-		double distance = 0;
 
 		for (Ant ant : ants) {
 			ant.resetTour();
@@ -51,13 +50,11 @@ public class ASrankWorld extends World {
 				nextCustomer = ant.chooseNextMove(currCustomer, this.getSampleDouble());
 				if (nextCustomer != null){
 					nextCustomer = this.getCustomer(nextCustomer.getId());
-					distance = nextCustomer.getNeighbor(currCustomer.getId()).getDistance();
-					ant.walk(nextCustomer, distance);
+					ant.walk(nextCustomer);
 				}
 			} while (nextCustomer != null);				
 			
-			distance = currCustomer.getNeighbor(ant.getFirstCustomer().getId()).getDistance();
-			ant.walk(ant.getFirstCustomer(), distance);
+			ant.walk(ant.getFirstCustomer());
 
 			ant.getTour().opt2IntraRoutes();
 			if (this.getBestTour() == null || this.getBestTour().getDistance() > ant.getTour().getDistance()){
