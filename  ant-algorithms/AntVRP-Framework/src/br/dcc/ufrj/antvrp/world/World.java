@@ -120,7 +120,7 @@ public abstract class World {
 		}
 	}
 
-	private void computeDistances() {
+	protected void computeDistances() {
 		for (Customer city : this.customers) {
 			for (Customer neighbor : this.customers) {
 				city.addNeigbour(neighbor);				
@@ -129,7 +129,7 @@ public abstract class World {
 		}
 	}
 
-	private String getName(BufferedReader reader) throws Exception {
+	protected String getName(BufferedReader reader) throws Exception {
 		String[] values = reader.readLine().split(":");
 
 		if (values != null && TAG_NAME.equals(Util.trim(values[0]))) {
@@ -139,7 +139,7 @@ public abstract class World {
 		}
 	}
 
-	private String getComment(BufferedReader reader) throws Exception {
+	protected String getComment(BufferedReader reader) throws Exception {
 		String[] values = reader.readLine().split(":");
 
 		if (values != null && TAG_COMMENT.equals(Util.trim(values[0]))) {
@@ -149,7 +149,7 @@ public abstract class World {
 		}
 	}
 
-	private String getType(BufferedReader reader) throws Exception {
+	protected String getType(BufferedReader reader) throws Exception {
 
 		String[] values = reader.readLine().split(":");
 
@@ -160,7 +160,7 @@ public abstract class World {
 		}
 	}
 
-	private int getDimension(BufferedReader reader) throws Exception {
+	protected int getDimension(BufferedReader reader) throws Exception {
 		String[] values = reader.readLine().split(":");
 		String dimension = null;
 
@@ -178,7 +178,7 @@ public abstract class World {
 		}
 	}
 
-	private String getEdgeWeightType(BufferedReader reader) throws Exception {
+	protected String getEdgeWeightType(BufferedReader reader) throws Exception {
 		String[] values = reader.readLine().split(":");
 
 		if (values != null && TAG_EDGE_WEIGHT_TYPE.equals(Util.trim(values[0]))) {
@@ -188,7 +188,7 @@ public abstract class World {
 		}
 	}
 
-	private int getCapacity(BufferedReader reader) throws Exception {
+	protected int getCapacity(BufferedReader reader) throws Exception {
 		String[] values = reader.readLine().split(":");
 		String capacity = null;
 
@@ -206,7 +206,7 @@ public abstract class World {
 		}
 	}
 
-	private void passNodeCoordSection(BufferedReader reader) throws Exception {
+	protected void passNodeCoordSection(BufferedReader reader) throws Exception {
 		String value = reader.readLine();
 
 		if (!TAG_NODE_COORD_SECTION.equals(Util.trim(value))) {
@@ -214,7 +214,7 @@ public abstract class World {
 		}
 	}
 
-	private Customer[] getCustomers(BufferedReader reader, int dimension) throws Exception {
+	protected Customer[] getCustomers(BufferedReader reader, int dimension) throws Exception {
 		Customer[] customers = new Customer[dimension];
 		int lat = 0;
 		int lon = 0;
@@ -244,7 +244,7 @@ public abstract class World {
 		return customers;
 	}
 
-	private void passDemandSection(BufferedReader reader) throws Exception {
+	protected void passDemandSection(BufferedReader reader) throws Exception {
 		String value = reader.readLine();
 
 		if (!TAG_DEMAND_SECTION.equals(Util.trim(value))) {
@@ -252,7 +252,7 @@ public abstract class World {
 		}
 	}
 
-	private void getDemands(BufferedReader reader, Customer[] cities) throws Exception {
+	protected void getDemands(BufferedReader reader, Customer[] cities) throws Exception {
 		String[] values = null;
 		int id = 0;
 		int demand = 0;
@@ -277,7 +277,7 @@ public abstract class World {
 		}
 	}
 
-	private void passDepotSection(BufferedReader reader) throws Exception {
+	protected void passDepotSection(BufferedReader reader) throws Exception {
 		String value = reader.readLine();
 
 		if (!TAG_DEPOT_SECTION.equals(Util.trim(value))) {
@@ -285,7 +285,7 @@ public abstract class World {
 		}
 	}
 
-	private void getDepots(BufferedReader reader) throws Exception {
+	protected void getDepots(BufferedReader reader) throws Exception {
 		ArrayList<Customer> depots = new ArrayList<Customer>();
 		String value = reader.readLine().replace(" ", "");
 		int id = 0;
@@ -315,7 +315,7 @@ public abstract class World {
 		}
 	}
 
-	private void eof(BufferedReader reader) throws Exception {
+	protected void eof(BufferedReader reader) throws Exception {
 		String value = reader.readLine();
 
 		if (!TAG_EOF.equals(Util.trim(value))) {
