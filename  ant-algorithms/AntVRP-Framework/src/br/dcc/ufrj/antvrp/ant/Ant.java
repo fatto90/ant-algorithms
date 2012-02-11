@@ -30,7 +30,7 @@ public abstract class Ant implements Comparable<Ant> {
 		return firstCustomer;
 	}
 
-	public void walk(Customer city, double distance) {
+	public void walk(Customer city) {
 		this.tour.add(city);
 		this.currentCapacity -= city.getDemand();
 	}
