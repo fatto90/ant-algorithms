@@ -47,14 +47,14 @@ public class MMASSimulator extends Simulator{
 	public static void main(String[] args) throws Exception {
 		MMASSimulator simulator = new MMASSimulator();
 		simulator.printHeader();
+		simulator.antAmount = 200;
 		
-		simulator.setFileName();
-		if (!simulator.isDefaultMode()){
+		if (simulator.isDefaultMode()){
 			simulator.setNumeroSimulacoes();
 			simulator.setQuantidadeFormigas();
 		}
 		
-		MMASWorld world = new MMASWorld();
+		MMASWorld world = new MMASWorld(0);
 		world.createWorld(simulator.getFileName());
 		
 		simulator.printInputs(world);		
@@ -71,7 +71,6 @@ public class MMASSimulator extends Simulator{
 				world.run();
 				if (world.getBestTour().getDistance() < bestSolution || bestSolution == 0) {
 					bestSolution = world.getBestTour().getDistance();
-					//System.out.println(bestSolution);
 					j = 0;
 				}
 			}
