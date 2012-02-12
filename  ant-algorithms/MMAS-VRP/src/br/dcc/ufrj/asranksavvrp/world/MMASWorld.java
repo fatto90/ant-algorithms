@@ -112,7 +112,7 @@ public class MMASWorld extends World {
 		}
 	}
 	
-	private void pheromoneUpdateWorstTour(Tour tour) {
+	public void pheromoneUpdateWorstTour(Tour tour) {
 		Customer a = null;
 		Customer b = null;
 		double pheromone = 0;
