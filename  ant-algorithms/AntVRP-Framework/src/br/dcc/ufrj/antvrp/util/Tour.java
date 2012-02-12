@@ -142,23 +142,25 @@ public class Tour implements Cloneable {
 
 		for (int r = 0; r < routes.size(); r++) {
 			Tour route = routes.get(r);
+			//System.out.println(route);
+			//System.out.println(route);
 			customers = route.getCustomers();
 
-			for (int i = 0; i < route.getSize() - 3;) {
+			for (int i = 0; i < route.getSize() - 3; i++) {
 				Customer a = customers[i];
 				aIndex = i;
-				Customer b = customers[++i];
-				bIndex = i;
+				Customer b = customers[i + 1];
+				bIndex = i + 1;
 				double distanceAB = a.getDistance(b);
 
-				for (int j = 1; j < route.getSize() - 1;) {
-					if (j >= i - 2 && j <= i + 2) {
-						break;
+				for (int j = 0; j < route.getSize() - 1;j++) {
+					if (Math.abs(j - i) < 2){
+						continue;
 					}
 					Customer c = customers[j];
 					cIndex = j;
-					Customer d = customers[++j];
-					dIndex = j;
+					Customer d = customers[j + 1];
+					dIndex = j + 1;
 					double distanceCD = c.getDistance(d);
 					double distanceAC = a.getDistance(c);
 					double distanceBD = b.getDistance(d);
