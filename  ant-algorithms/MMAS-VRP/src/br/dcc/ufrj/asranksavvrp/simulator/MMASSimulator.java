@@ -57,7 +57,7 @@ public class MMASSimulator extends Simulator{
 		MMASWorld world = new MMASWorld(0);
 		world.createWorld(simulator.getFileName());
 		
-		simulator.printInputs(world);		
+		simulator.printInputs(world);
 		simulator.printIntance(world);
 		
 		world.createAnts(simulator.getAntAmount());
@@ -72,6 +72,7 @@ public class MMASSimulator extends Simulator{
 				if (world.getBestTour().getDistance() < bestSolution || bestSolution == 0) {
 					bestSolution = world.getBestTour().getDistance();
 					j = 0;
+					//System.out.println(bestSolution + " " + world.getBestTour());
 				}
 			}
 			

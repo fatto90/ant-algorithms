@@ -58,7 +58,7 @@ public class ASrankSavWorld extends World {
 				this.setWorstTour(ant.getTour().clone());
 			}
 			
-			ant.getTour().opt2IntraRoutes();
+			ant.getTour().opt2();
 			
 			if (this.getBestTour() == null || this.getBestTour().getDistance() > ant.getTour().getDistance()){
 				this.setBestTour(ant.getTour().clone());
@@ -160,9 +160,6 @@ public class ASrankSavWorld extends World {
 					heuristic = depot.getDistance(j);
 				} else {
 					heuristic = depot.getDistance(i) + depot.getDistance(j) - i.getDistance(j);
-					if (heuristic < 0){
-						System.out.println(heuristic);
-					}
 				}
 				j.setHeuristic(heuristic);
 			}

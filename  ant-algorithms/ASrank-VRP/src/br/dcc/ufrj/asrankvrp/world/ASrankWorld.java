@@ -56,7 +56,7 @@ public class ASrankWorld extends World {
 			
 			ant.walk(ant.getFirstCustomer());
 
-			ant.getTour().opt2IntraRoutes();
+			ant.getTour().opt2();
 			if (this.getBestTour() == null || this.getBestTour().getDistance() > ant.getTour().getDistance()){
 				this.setBestTour(ant.getTour().clone());
 			}

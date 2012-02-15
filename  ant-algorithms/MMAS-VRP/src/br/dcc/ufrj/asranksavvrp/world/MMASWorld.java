@@ -66,7 +66,9 @@ public class MMASWorld extends World {
 				this.setIterationWorst(ant.getTour().clone());
 			}
 
-			ant.getTour().opt2IntraRoutes();
+			//System.out.println(ant.getTour().getDistance() + " A: " + ant.getTour());
+			ant.getTour().opt2();
+			//System.out.println(ant.getTour().getDistance() + " D: " + ant.getTour());
 
 			if (this.getBestTour() == null || this.getBestTour().getDistance() > ant.getTour().getDistance()) {
 				this.setBestTour(ant.getTour().clone());

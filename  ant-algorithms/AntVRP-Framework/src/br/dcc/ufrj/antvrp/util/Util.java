@@ -2,6 +2,7 @@ package br.dcc.ufrj.antvrp.util;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 
 import br.dcc.ufrj.antvrp.world.Customer;
 
@@ -10,7 +11,7 @@ public class Util {
 	public static String trim(String string) {
 		return string == null ? "" : string.trim();
 	}
-	
+
 	public static boolean empty(String string) {
 		return string == null || "".equals(string);
 	}
@@ -66,7 +67,7 @@ public class Util {
 		}
 		return 0;
 	}
-	
+
 	public static int getIntegerStdin(String label) throws Exception {
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 		String input = "";
@@ -130,16 +131,30 @@ public class Util {
 		}
 		return false;
 	}
-	
+
 	public static String getStringStdin(String label) throws Exception {
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 		String input = "";
-		
+
 		while (empty(input)) {
 			System.out.print(label);
 			input = trim(in.readLine());
 		}
 		return input;
+	}
+
+	public static int min(int i, int j, int k) {
+		return Math.min(i, Math.min(j, k));
+	}
+
+	public static int max(int i, int j, int k) {
+		return Math.max(i, Math.max(j, k));
+	}
+
+	public static int mid(int i, int j, int k) {
+		int[] v = { i, j, k };
+		Arrays.sort(v);
+		return v[1];
 	}
 
 }

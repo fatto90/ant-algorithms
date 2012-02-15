@@ -131,7 +131,7 @@ public class Tour implements Cloneable {
 		return distance;
 	}
 
-	public Tour opt2IntraRoutes() {
+	public Tour opt2() {
 		ArrayList<Tour> routes = this.getRoutes();
 		Customer[] customers = null;
 		Customer t = null;
@@ -142,8 +142,6 @@ public class Tour implements Cloneable {
 
 		for (int r = 0; r < routes.size(); r++) {
 			Tour route = routes.get(r);
-			//System.out.println(route);
-			//System.out.println(route);
 			customers = route.getCustomers();
 
 			for (int i = 0; i < route.getSize() - 3; i++) {
@@ -190,6 +188,92 @@ public class Tour implements Cloneable {
 			}
 		}
 
+		int i = 0;
+		Customer a = null;
+		for (Tour route : routes) {
+
+			for (int j = 0; j < route.getSize(); j++) {
+				Customer b = route.getCustomers()[j];
+				if (a != null) {
+					if (a.getId() != b.getId()) {
+						this.customers[i] = b;
+						i++;
+					}
+
+				} else {
+					this.customers[i] = b;
+					i++;
+
+				}
+				a = b;
+			}
+		}
+
+		this.recalcDistance();
+
+		return this;
+	}
+	
+	public Tour opt3() {
+		ArrayList<Tour> routes = this.getRoutes();
+		Customer t = null;
+		Customer[] customers = null;
+
+		for (int r = 0; r < routes.size(); r++) {
+			Tour route = routes.get(r);
+			customers = route.getCustomers();
+			
+			for (int i = 0; i < route.getSize() - 1; i++){
+				for (int j = 0; j < route.getSize() - 1; j++){
+					if (Math.abs(j - i) < 2){
+						continue;
+					}
+					
+					for (int k = 0; k < route.getSize() - 1; k++){
+						if (Math.abs(k - j) < 2 || Math.abs(k - i) < 2){
+							continue;
+						}
+						
+						int[] v = {i, j, k};
+						Arrays.sort(v);
+						
+						int x = v[0];
+						int y = v[1];
+						int z = v[2];
+
+						Customer a = customers[x];
+						Customer b = customers[x + 1];
+						Customer c = customers[y];
+						Customer d = customers[y + 1];
+						Customer e = customers[z];
+						Customer f = customers[z + 1];
+						
+						double distanciaAntes = a.getDistance(b) + c.getDistance(d) + e.getDistance(f);
+						double distanciaDepois = a.getDistance(d) + e.getDistance(b) + c.getDistance(f);
+						
+						if (distanciaAntes > distanciaDepois){
+							System.out.println(Arrays.toString(customers));
+							System.out.println(Tour.getDistance(customers));
+
+							customers[x + 1] = d;
+							customers[y + 1] = b;
+							t = b;
+							b = d;
+							d = t;
+							
+							customers[y] = e;
+							customers[z] = c;
+							t = c;
+							c = e;
+							e = t;
+							System.out.println(Arrays.toString(customers));
+							System.out.println(Tour.getDistance(customers));
+						}
+					}
+				}
+			}
+		}	
+		
 		int i = 0;
 		Customer a = null;
 		for (Tour route : routes) {
@@ -311,5 +395,25 @@ public class Tour implements Cloneable {
 
 	public boolean contains(Customer customer) {
 		return this.visited[customer.getId() - 1];
+	}
+	
+	public static double getDistance(Customer[] customers){
+		Customer a = null;
+		double distance = 0;
+
+		for (int i = 0; i < customers.length; i++) {
+			Customer b = customers[i];
+			if (a != null) {
+				if (b != null){
+					distance += a.getDistance(b);
+				} else {
+					break;
+				}
+			}
+			a = b;
+		}
+
+		return distance;
+		
 	}
 }
