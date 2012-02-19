@@ -53,7 +53,7 @@ public class AsRankSavSimulator extends Simulator{
 		System.out.println("Tipo: " + world.getType());
 		System.out.println("Dimensao: " + world.getDimension());
 		System.out.println("Edge Weight Type: " + world.getEdgeWeightType());
-		System.out.println("Capacidade: " + world.getCapacity() + "\n");
+		System.out.println("Capacidade: " + world.getCapacity() + "\n ");
 		
 	}	
 
