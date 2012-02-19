@@ -82,7 +82,7 @@ public class AsRankSimulator extends Simulator{
 			long t2 = System.currentTimeMillis();
 			double bestSolution = 0;
 			
-			for (int i = 1, j = 0; j <= simulator.getRodadasEstaveis(); i++, j++) {
+			for (int j = 0; j <= simulator.getRodadasEstaveis(); j++) {
 				world.run();
 				if (world.getBestTour().getDistance() < bestSolution || bestSolution == 0) {
 					bestSolution = world.getBestTour().getDistance();
