@@ -4,7 +4,7 @@ import br.dcc.ufrj.antvrp.util.Util;
 
 public abstract class Simulator {
 	
-	protected String fileName = "C:\\Users\\Fabio\\Desktop\\dataset\\att48.vrp";
+	protected String fileName = "/Users/fabioaab/Dropbox/fabio/datasets/CVRP/att-n48-k4.vrp";
 	protected final int RODADAS_ESTAVEIS = 100;
 	protected int numeroSimulacoes = 100;
 	protected int antAmount = 1000;
