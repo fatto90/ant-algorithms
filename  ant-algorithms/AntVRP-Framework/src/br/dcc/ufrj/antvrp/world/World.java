@@ -290,7 +290,7 @@ public abstract class World {
 		String value = reader.readLine().replace(" ", "");
 		int id = 0;
 
-		for (int i = 0; !"-1".equals(value); i++) {
+		for (;!"-1".equals(value);) {
 
 			id = Integer.parseInt(value);
 
