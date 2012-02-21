@@ -66,9 +66,7 @@ public class MMASWorld extends World {
 				this.setIterationWorst(ant.getTour().clone());
 			}
 
-			//System.out.println(ant.getTour().getDistance() + " A: " + ant.getTour());
 			ant.getTour().opt2();
-			//System.out.println(ant.getTour().getDistance() + " D: " + ant.getTour());
 
 			if (this.getBestTour() == null || this.getBestTour().getDistance() > ant.getTour().getDistance()) {
 				this.setBestTour(ant.getTour().clone());
