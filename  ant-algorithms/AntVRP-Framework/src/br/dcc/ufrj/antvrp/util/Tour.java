@@ -13,21 +13,56 @@ public class Tour implements Cloneable {
 	private int dimension = 0;
 	private int size = 0;
 	private boolean[] visited;
+	private Step[] steps;
+	private Step[] sortedSteps;
 
 	public Tour(Customer firstCustomer, int dimension) {
 		this.customers = new Customer[dimension * 2];
+		this.steps = new Step[dimension * 2];
 		this.visited = new boolean[dimension];
 		this.customers[0] = firstCustomer;
 		this.visited[0] = true;
 		this.firstCustomer = firstCustomer;
 		this.dimension = dimension;
 		this.size = 1;
+		
 	}
 
 	public Tour(int dimension) {
 		this.customers = new Customer[dimension * 2];
+		this.steps = new Step[dimension * 2];
 		this.visited = new boolean[dimension];
 		this.dimension = dimension;
+	}
+	
+	public void sortSteps(){
+		sortedSteps = steps.clone();
+		Arrays.sort(sortedSteps);
+	}
+	
+	public Step[] getSteps(){
+		return this.steps;
+	}
+	
+	public Step[] getSortedSteps(){
+		return this.sortedSteps;
+	}
+	
+	public boolean areNeighbor(Customer a, Customer b){
+		
+		for(Step hop: this.steps){
+			
+			if(hop != null){
+				if ((a.getId() == hop.getSource().getId() && b.getId() == hop.getDestination().getId()) ||
+					(a.getId() == hop.getDestination().getId() && b.getId() == hop.getSource().getId())){
+					return true;
+				}
+			} else {
+				return false;
+			}
+		}
+		
+		return false;
 	}
 
 	public Customer[] getCustomers() {
@@ -37,6 +72,7 @@ public class Tour implements Cloneable {
 	public void reset() {
 		this.visited = new boolean[dimension];
 		this.customers = new Customer[dimension * 2];
+		this.steps = new Step[dimension * 2];
 		this.customers[firstCustomer.getId() - 1] = this.firstCustomer;
 		this.visited[firstCustomer.getId() - 1] = true;
 		this.distance = 0;
@@ -45,6 +81,7 @@ public class Tour implements Cloneable {
 
 	public void add(Customer customer) {
 		this.customers[this.size] = customer;
+		this.steps[this.size] = new Step(this.customers[this.size - 1], this.customers[this.size]);
 		this.visited[customer.getId() - 1] = true;
 		this.distance += this.customers[this.size - 1].getDistance(customer);
 		this.size++;

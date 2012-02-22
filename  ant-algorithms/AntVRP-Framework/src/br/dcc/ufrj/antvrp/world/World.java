@@ -7,7 +7,6 @@ import java.util.Random;
 
 import br.dcc.ufrj.antvrp.ant.Ant;
 import br.dcc.ufrj.antvrp.exception.IllegalArgumentWorldException;
-import br.dcc.ufrj.antvrp.pheromone.Pheromone;
 import br.dcc.ufrj.antvrp.util.Tour;
 import br.dcc.ufrj.antvrp.util.Util;
 
@@ -31,8 +30,6 @@ public abstract class World {
 	private Tour bestTour;
 	private Tour worstTour;
 	
-
-	protected Pheromone pheromone;
 	private Random random;
 
 	private static final String TAG_NAME = "NAME";
